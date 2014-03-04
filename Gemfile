@@ -33,3 +33,4 @@ group :doc do
 end
 
 gem 'slim-rails', '~> 2.1.0'
+gem 'angularjs-rails'
