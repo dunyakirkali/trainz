@@ -32,4 +32,4 @@ group :doc do
   gem 'sdoc', require: false
 end
 
-gem 'slim-rails'
+gem 'slim-rails', '~> 2.1.0'
