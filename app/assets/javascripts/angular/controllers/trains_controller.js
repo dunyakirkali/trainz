@@ -1,13 +1,5 @@
-trainzApp.controller('TrainsController', function ($scope) {
-  $scope.phones = [
-    {'name': 'Nexus S',
-     'snippet': 'Fast just got faster with Nexus S.'},
-    {'name': 'Motorola XOOM™ with Wi-Fi',
-     'snippet': 'The Next, Next Generation tablet.'},
-    {'name': 'MOTOROLA XOOM™',
-     'snippet': 'The Next, Next Generation tablet.'}
-  ];
-  
+trainzApp.controller('TrainsController', ['$scope', 'D3Service',
+function ($scope, D3Service) {  
   $scope.trains = [{
     name: 'Dunya',
     controls: {
@@ -15,4 +7,7 @@ trainzApp.controller('TrainsController', function ($scope) {
     }
     // carriages: 
   }];
-});
+  
+  D3Service.init();
+  D3Service.animate();
+}]);
