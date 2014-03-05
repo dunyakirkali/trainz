@@ -35,3 +35,4 @@ end
 gem 'slim-rails', '~> 2.1.0'
 gem 'angularjs-rails'
 gem "d3-rails"
+gem "jquery-ui-rails", "~> 4.2.0"

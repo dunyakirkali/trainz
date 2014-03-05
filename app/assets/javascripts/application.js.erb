@@ -11,11 +11,14 @@
 // about supported directives.
 //
 //= require jquery
+//= require jquery.ui.all
 //= require jquery_ujs
 //= require turbolinks
 //= require angular
+//= require slider
 //= require d3
-//= require_tree .
+//= require angular/app
+//= require angular/controllers/trains_controller
 
 $(function() {
   var json, map,
@@ -24,7 +27,28 @@ $(function() {
   
   var circles = [];
   
-  carriages = ['locomotive', 'carriage_1', 'carriage_1', 'carriage_2']
+  carriages = [{
+    type: 'locomotive',
+    color: '#735702'
+  },{
+    type: 'carriage_1',
+    color: '#034959'
+  },{
+    type: 'carriage_1',
+    color: '#034959'
+  },{
+    type: 'carriage_2',
+    color: '#012E40'
+  },{
+    type: 'carriage_1',
+    color: '#034959'
+  },{
+    type: 'carriage_2',
+    color: '#012E40'
+  },{
+    type: 'carriage_2',
+    color: '#012E40'
+  }]
 
   json = {
       "type": "FeatureCollection",
@@ -667,16 +691,8 @@ $(function() {
       .attr("width", 960)
       .attr("height", 600);
 
-  vis.append("svg:g")
-      .attr("class", "route")
-      .selectAll("path")
-      .data(json.features)
-      .enter()
-      .append("svg:path")
-      .attr("d", path)
-      .attr("fill-opacity", 0.5)
-      .attr("fill", "#fff")
-      .attr("stroke", "#333");
+  vis.append("svg:g").attr("class", "route").selectAll("path").data(json.features).enter().append("svg:path")
+      .attr("d", path).attr("stroke", "#333").attr("fill", "#EBEFF2");
 
   // Draw a red circle on the map:
 
@@ -687,30 +703,58 @@ $(function() {
   var pathLength = pathNode.getTotalLength();
   
   for(var i = 0; i < carriages.length; i++) {
-    circles[i] = group.append("circle")
-        .attr({
-        r: 10,
-        fill: '#f33',
-        transform: function () {
-            var p = pathNode.getPointAtLength(0)
-            return "translate(" + [p.x, p.y] + ")";
-        }
-    });
+    circles[i] = group.append("circle").attr({ r: 10 });
   }
   
   var t = 0.0;
-  var step = 0.004;
+  var step = 0.001;
   var delay = 0.01;
+  var horned = false;
+  var accelerating = true;
+  var speed = 0.00002;
+  
+  $("#yourAudioTag").bind('ended', function(){
+    horned = false;
+  });
+  
   function trans() {
+    if(accelerating) {
+      step += speed;
+    } else {
+      step -= speed;
+    }
+    
+    if(step <= 0) {
+      accelerating = true;
+    } else {
+      if(step >= 0.005) {
+        accelerating = false;
+      } 
+    }
+    
     t = t + step;
     t %= 1.0;
     
     for(var i = 0; i < carriages.length; i++) {
+      if(t > 0.3) {
+        if(!horned) {
+          console.log('bam');
+          horned = true;
+          var thissound = document.getElementById('yourAudioTag');
+          // thissound.src = "#{ asset_path '73900^TRAIN.mp3' }";
+          // thissound.load();
+          thissound.currentTime=0.0;
+          thissound.play();
+        }
+      }
       circles[i].attr({
+        fill: carriages[i].color,
         transform: function () {
           var nT = t - (delay * i);
           var p = pathNode.getPointAtLength(pathLength * nT);
-          return "translate(" + [p.x, p.y] + ")";
+          var isoX = p.x;//(p.x - p.y);
+          var isoY = p.y;//(p.x + p.y) / 2;
+          return "translate(" + [isoX, isoY] + ")";
         }
       })
     }

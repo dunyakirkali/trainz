@@ -1,3 +1,12 @@
 h1 Trainz
 p Online train simulator
 #map
+audio#yourAudioTag preload="auto"
+  source src="#{ asset_path '73900^TRAIN.mp3' }"
+  | Your browser does not support the audio element.
+#controls
+  ul
+    li ng-repeat="(key, value) in trains[0].controls"
+    	div ui-slider='true' min="0" max="50" ng-model="key"
+        a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"
+        input type="text" ng-model="demoVals.sliderExample1" class="ng-pristine ng-valid"
