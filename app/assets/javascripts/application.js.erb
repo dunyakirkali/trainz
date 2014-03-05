@@ -19,6 +19,7 @@
 //= require d3
 //= require angular/app
 //= require angular/controllers/trains_controller
+//= require angular/services/d3
 
 $(function() {
   var json, map,
@@ -752,8 +753,10 @@ $(function() {
         transform: function () {
           var nT = t - (delay * i);
           var p = pathNode.getPointAtLength(pathLength * nT);
-          var isoX = p.x;//(p.x - p.y);
-          var isoY = p.y;//(p.x + p.y) / 2;
+          // var isoX = (p.x - p.y) + 240;
+          // var isoY = (p.x + p.y) / 2;
+          var isoX = p.x;
+          var isoY = p.y;
           return "translate(" + [isoX, isoY] + ")";
         }
       })
