@@ -3,7 +3,6 @@ trainzApp.service('D3Service', function () {
   d3Service.t = 0.0;
   d3Service.step = 0.001;
   d3Service.delay = 0.01;
-  d3Service.horned = false;
   d3Service.accelerating = true;
   d3Service.speed = 0.00002;
   d3Service.json;
@@ -15,7 +14,6 @@ trainzApp.service('D3Service', function () {
   d3Service.group;
   d3Service.pathNode;
   d3Service.circles = [];
-  
   d3Service.carriages = [{
     type: 'locomotive',
     color: '#735702'
@@ -670,10 +668,6 @@ trainzApp.service('D3Service', function () {
   };
     
   d3Service.init = function() {
-    $("#yourAudioTag").bind('ended', function(){
-      this.horned = false;
-    });  
-    
     d3Service.drawPath();
     d3Service.addCircles();
   };
@@ -684,6 +678,7 @@ trainzApp.service('D3Service', function () {
     this.xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
     this.path = d3.geo.path().projection(this.xy);
 
+    console.log('aaa');
     this.vis = d3.select("#map")
         .append("svg:svg")
         .attr("width", 960)
@@ -724,6 +719,7 @@ trainzApp.service('D3Service', function () {
   
   d3Service.animate = function() {
     function trans() {
+      console.log('anim');
       if(this.accelerating) {
         this.step += this.speed;
       } else {
@@ -737,24 +733,28 @@ trainzApp.service('D3Service', function () {
           this.accelerating = false;
         } 
       }
-      
-      if(this.t > 0.3) {
-        if(!this.horned) {
-          this.horned = true;
-          // var thissound = document.getElementById('yourAudioTag');
-          // thissound.currentTime=0.0;
-          // thissound.play();
-        }
-      }
     
       this.t = this.t +this.step;
       this.t %= 1.0;
+      
+      var delta = (Date.now() - this.t);
+      d3.select("#map").select('path').attr("transform", function(d) {
+        return "rotate(" + d.phi0 + delta * d.speed/200 + ")";
+      });
     
-      d3Service.drawCircles(this.t);
+      // d3Service.drawCircles(this.t);
     }
   
     d3.timer(trans);
   };
+  
+  d3Service.updateWindow = function(){
+      x = window.innerWidth || document.documentElement.clientWidth;
+      y = window.innerHeight|| document.documentElement.clientHeight;
+
+      d3.selectAll('.route')[0][0].attr("width", x).attr("height", y);
+  }
+  window.onresize = d3Service.updateWindow;
   
   return d3Service;
 });

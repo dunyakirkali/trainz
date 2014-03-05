@@ -1,5 +1,5 @@
-trainzApp.controller('TrainsController', ['$scope', 'D3Service',
-function ($scope, D3Service) {  
+trainzApp.controller('TrainsController', ['$scope', 'D3Service', 'AudioService',
+function ($scope, D3Service, AudioService) {  
   $scope.trains = [{
     name: 'Dunya',
     controls: {
@@ -8,6 +8,7 @@ function ($scope, D3Service) {
     // carriages: 
   }];
   
+  AudioService.init();
   D3Service.init();
   D3Service.animate();
 }]);
