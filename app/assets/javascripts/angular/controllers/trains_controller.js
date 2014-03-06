@@ -13,6 +13,6 @@ function ($scope, D3Service, AudioService) {
   };
   
   AudioService.init();
-  // D3Service.init();
+  D3Service.init();
   // D3Service.animate();
 }]);
