@@ -1,29 +1,28 @@
 trainzApp.service('D3Service', function () {
   
-  this.init = function(){
-    this.t = 0.0;
-    this.step = 0.001;
-    this.delay = 0.01;
-    this.accelerating = true;
-    this.speed = 0.00002;
-    this.json;
-    this.map;
-    this.path;
-    this.vis;
-    this.xy;
-    this.pathLength; 
-    this.group;
-    this.pathNode;
-    this.circles = [];
-    this.map = $('#map');
-    this.xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
-    this.path = d3.geo.path().projection(this.xy);    
-    this.vis = d3.select("#map")
+    var t = 0.0;
+    var step = 0.001;
+    var delay = 0.01;
+    var accelerating = true;
+    var speed = 0.00002;
+    var json;
+    var map;
+    var path;
+    var vis;
+    var xy;
+    var pathLength; 
+    var group;
+    var pathNode;
+    var circles = [];
+    var map = $('#map');
+    var xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
+    var path = d3.geo.path().projection(xy);    
+    var vis = d3.select("#map")
             .append("svg:svg")
             .attr("width", 960)
             .attr("height", 600);
 
-    this.carriages = [{
+    var carriages = [{
       type: 'locomotive',
       color: '#735702'
     },{
@@ -46,7 +45,7 @@ trainzApp.service('D3Service', function () {
       color: '#012E40'
     }]
 
-    this.json = {
+    var json = {
         "type": "FeatureCollection",
             "features": [{
             "type": "Feature",
@@ -674,89 +673,92 @@ trainzApp.service('D3Service', function () {
                 ]
             }
         }]
-    };            
+    };    
+    var group;
+
+  this.setSpeed = function(newSpeed) {
+    console.log(newSpeed);
+    if(newSpeed == 0) return;
+    speed = parseFloat(newSpeed);
+  }
+    
+  this.init = function(){        
             
     this.addPath();
+    this.addCircles();
+    
+    // window.onresize = var updateWindow;
   }; 
 
 
   this.addPath = function() {    
-    this.vis.append("svg:g")
+    vis.append("svg:g")
     .attr("class", "route")
     .selectAll("path")
-    .data(this.json.features)
+    .data(json.features)
     .enter()
     .append("svg:path")
-    .attr("d", this.path)
+    .attr("d", path)
     .attr("stroke", "#333")
     .attr("fill", "#EBEFF2");
   };
-//   
-//   this.addCircles = function() {
-//     this.group = this.vis.append("svg:g");
-//   
-//     var targetPath = d3.selectAll('.route')[0][0];
-//     this.pathNode = d3.select(targetPath).selectAll('path').node();
-//     this.pathLength = this.pathNode.getTotalLength();
-//   
-//     for(var i = 0; i < this.carriages.length; i++) {
-//       this.circles[i] = this.group.append("circle").attr({ r: 10 });
-//     }
-//   };
-//   
-//   this.drawCircles = function(t) {
-//     for(var i = 0; i < this.carriages.length; i++) {
-//       this.circles[i].attr({
-//         fill: this.carriages[i].color,
-//         transform: function () {
-//           var nT = t - (this.delay * i);
-//           var p = this.pathNode.getPointAtLength(this.pathLength * nT);
-//           var isoX = p.x;
-//           var isoY = p.y;
-//           return "translate(" + [isoX, isoY] + ")";
-//         }
-//       })
-//     }
-//     
-//   };
-//   
-//   this.animate = function() {
-//     function trans() {
-//       console.log('anim');
-//       if(this.accelerating) {
-//         this.step += this.speed;
-//       } else {
-//         this.step -= this.speed;
-//       }
-//     
-//       if(this.step <= 0) {
-//         this.accelerating = true;
-//       } else {
-//         if(this.step >= 0.005) {
-//           this.accelerating = false;
-//         } 
-//       }
-//     
-//       this.t = this.t +this.step;
-//       this.t %= 1.0;
-//       
-//       var delta = (Date.now() - this.t);
-//       d3.select("#map").select('path').attr("transform", function(d) {
-//         return "rotate(" + d.phi0 + delta * d.speed/200 + ")";
-//       });
-//     
-//       // this.drawCircles(this.t);
-//     }
-//   
-//     d3.timer(trans);
-//   };
-//   
-//   this.updateWindow = function(){
-//       x = window.innerWidth || document.documentElement.clientWidth;
-//       y = window.innerHeight|| document.documentElement.clientHeight;
-// 
-//       d3.selectAll('.route')[0][0].attr("width", x).attr("height", y);
-//   }
-//   window.onresize = this.updateWindow;
+  
+  this.addCircles = function() {
+    group = vis.append("svg:g");
+  
+    targetPath = d3.selectAll('.route')[0][0];
+    pathNode = d3.select(targetPath).selectAll('path').node();
+    pathLength = pathNode.getTotalLength();
+  
+    for(var i = 0; i < carriages.length; i++) {
+      circles[i] = group.append("circle").attr({ r: 10 });
+    }
+  };
+  
+  this.animate = function() {  
+    d3.timer(this.trans);
+  }
+  
+  this.trans = function() {
+      // if(accelerating) {
+      //   step += speed;
+      // } else {
+      //   step -= speed;
+      // }
+         
+      // if(step <= 0) {
+      //   accelerating = true;
+      // } else {
+      //   if(step >= 0.005) {
+      //     accelerating = false;
+      //   } 
+      // }
+         
+     t = t + speed;
+     t %= 1.0;
+     
+     console.log(t);
+     
+     for(var i = 0; i < carriages.length; i++) {
+       circles[i].attr({
+         fill: carriages[i].color,
+         transform: function () {
+           var nT = t - (delay * i);
+           var p = pathNode.getPointAtLength(pathLength * nT);
+           var isoX = p.x;
+           var isoY = p.y;
+           return "translate(" + [isoX, isoY] + ")";
+         }
+       })
+     }
+  }
+
+  
+  this.updateWindow = function(){
+      x = window.innerWidth || document.documentElement.clientWidth;
+      y = window.innerHeight|| document.documentElement.clientHeight;
+
+      // d3.selectAll('.route')[0][0].attr("width", x).attr("height", y);
+  }
   return this;
 });
