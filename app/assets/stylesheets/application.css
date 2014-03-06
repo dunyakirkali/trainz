@@ -9,10 +9,11 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
+ *= require jquery.ui.all
  *= require_tree .
  */
 
 body {
   color:#778A8C;
-  background-color:#EBEFF2;
+  background-color: ;
 }

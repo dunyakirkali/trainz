@@ -1,15 +1,15 @@
 trainzApp.service('D3Service', function () {
   
     var t = 0.0;
-    var step = 0.001;
     var delay = 0.01;
     var accelerating = true;
-    var speed = 0.00002;
+    var speed = 0.00000;
     var json;
     var map;
     var path;
     var vis;
     var xy;
+    var angle = 0;
     var pathLength; 
     var group;
     var pathNode;
@@ -17,10 +17,7 @@ trainzApp.service('D3Service', function () {
     var map = $('#map');
     var xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
     var path = d3.geo.path().projection(xy);    
-    var vis = d3.select("#map")
-            .append("svg:svg")
-            .attr("width", 960)
-            .attr("height", 600);
+    var vis = d3.select("#map").append("svg:svg").attr("width", 960).attr("height", 600);
 
     var carriages = [{
       type: 'locomotive',
@@ -677,9 +674,8 @@ trainzApp.service('D3Service', function () {
     var group;
 
   this.setSpeed = function(newSpeed) {
-    console.log(newSpeed);
     if(newSpeed == 0) return;
-    speed = parseFloat(newSpeed);
+    speed = parseFloat(newSpeed) / 100;
   }
     
   this.init = function(){        
@@ -719,31 +715,15 @@ trainzApp.service('D3Service', function () {
     d3.timer(this.trans);
   }
   
-  this.trans = function() {
-      // if(accelerating) {
-      //   step += speed;
-      // } else {
-      //   step -= speed;
-      // }
-         
-      // if(step <= 0) {
-      //   accelerating = true;
-      // } else {
-      //   if(step >= 0.005) {
-      //     accelerating = false;
-      //   } 
-      // }
-         
-     t = t + speed;
-     t %= 1.0;
-     
-     console.log(t);
+  this.trans = function() {              
+     t += speed;
      
      for(var i = 0; i < carriages.length; i++) {
        circles[i].attr({
          fill: carriages[i].color,
          transform: function () {
            var nT = t - (delay * i);
+           nT = nT - Math.floor(nT);
            var p = pathNode.getPointAtLength(pathLength * nT);
            var isoX = p.x;
            var isoY = p.y;
