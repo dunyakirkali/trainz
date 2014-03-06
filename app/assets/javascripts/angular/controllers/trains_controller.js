@@ -8,7 +8,11 @@ function ($scope, D3Service, AudioService) {
     // carriages: 
   }];
   
+  $scope.horn = function () {
+    AudioService.play();
+  };
+  
   AudioService.init();
-  D3Service.init();
-  D3Service.animate();
+  // D3Service.init();
+  // D3Service.animate();
 }]);

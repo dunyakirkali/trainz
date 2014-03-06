@@ -1,17 +1,17 @@
 trainzApp.service('AudioService', function () {
-  var audioService = {};
+  this.el;
   
-  audioService.play = function() {
-    var thissound = $("#yourAudioTag");
-    thissound.currentTime = 0.0;
-    thissound.play();
+  this.play = function() {
+    this.el.currentTime = 0.0;
+    this.el.play();
   }
   
-  audioService.init = function() {
+  this.init = function() {
+    this.el = document.getElementById("yourAudioTag");
     $("#yourAudioTag").bind('ended', function(){
       this.horned = false;
     });  
   }
-    
-  return audioService;
+  
+  return this;
 });

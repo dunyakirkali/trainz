@@ -12,6 +12,7 @@ audio#yourAudioTag preload="auto"
   | Your browser does not support the audio element.
   
 #controls
-	div ui-slider='true' min="0" max="50" ng-model="trains[0].controls.speed"
-    a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"
-    input type="text" ng-model="trains[0].controls.speed" class="ng-pristine ng-valid"
+  button ng-click="horn()" Horn
+  / div ui-slider='true' min="0" max="50" ng-model="trains[0].controls.speed"
+  /     a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"
+  /     input type="text" ng-model="trains[0].controls.speed" class="ng-pristine ng-valid"
