@@ -1,0 +1,83 @@
+DKOverlay.prototype = new google.maps.OverlayView();
+function DKOverlay(bounds, map) {
+
+  this.bounds_ = bounds;
+  this.setMap(map);  
+  
+  this.xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
+  this.path = d3.geo.path().projection(this.xy);
+  this.vis;
+  this.group;
+  this.circles = [];    
+  this.pathNode;
+  this.pathLength;
+}
+
+DKOverlay.prototype.addPath = function() {  
+  var that = this;  
+  d3.json("<%= asset_path 'track.json' %>", function(json) {
+    that.vis.append("svg:g")
+    .attr("class", "route")
+    .selectAll("path")
+    .data(json.features)
+    .enter()
+    .append("svg:path")
+    .attr("d", that.path)
+    .attr("stroke", "#333")
+    .attr("fill", "#EBEFF2");
+    
+    that.group = that.vis.append("svg:g");
+    var targetPath = d3.selectAll('.route')[0][0];
+    that.pathNode = d3.select(targetPath).selectAll('path').node();
+    that.pathLength = that.pathNode.getTotalLength();
+    that.circles.push(that.group.append("circle").attr({ r: 10 }));
+    
+    that.draw();
+  });
+};
+
+DKOverlay.prototype.onAdd = function() {
+
+  this.vis = d3.select(this.getPanes().overlayLayer).append('div')
+                .attr('id','d3map')
+                .style('width', '600px')
+                .style('height', '400px')
+            .append('svg')
+                .attr('width', 600)
+                .attr('height', 400);
+                
+  this.addPath();
+    
+  google.maps.event.addListener(map, 'bounds_changed', this.draw);
+  google.maps.event.addListener(map, 'center_changed', this.draw);
+};
+
+DKOverlay.prototype.draw = function() {         
+ for(var i = 0; i < this.circles.length; i++) {
+   var t = 0.5;
+   var that = this;
+
+    this.circles[i].attr({
+      
+      fill: "#a32",
+      transform: function () {
+         console.log("aa");  
+        var nT = t;
+        nT = nT - Math.floor(nT);
+        var p = that.pathNode.getPointAtLength(that.pathLength * nT);
+        var isoX = p.x;
+        var isoY = p.y;
+        return "translate(" + [isoX, isoY] + ")";
+      }
+    })
+  }
+};
+
+DKOverlay.prototype.onRemove = function() {
+  this.vis.parentNode.removeChild(this.vis);
+  this.vis = null;
+};
+
+trainzApp.factory('DKOverlay', function ($rootScope) {
+  return DKOverlay;
+});

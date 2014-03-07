@@ -715,6 +715,11 @@ trainzApp.service('D3Service', function () {
     d3.timer(this.trans);
   }
   
+  this.startPoint = function() {
+    return {x:-75.194946527,
+                    y:43.093336741}
+  }
+  
   this.trans = function() {              
      t += speed;
      

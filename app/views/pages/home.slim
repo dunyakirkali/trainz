@@ -4,14 +4,13 @@ p Train simulator for Google Maps using D3
 #train_details
   p Train name: {{ trains[0].name }}
   p Train speed: {{ trains[0].controls.speed }}
-  
+#controls
+  button ng-click="horn()" Horn
+  div ui-slider="true" min="-0.50" max="2.00" step="0.01" use-decimals=true ng-model="trains[0].controls.speed" ng-change="speedChanged()"
+    a href="#" style="left: 26%;"
+#google_map style="height: 400px; width:100%;"
 #map
 
 audio#yourAudioTag preload="auto"
   source src="#{ asset_path '73900^TRAIN.mp3' }"
   | Your browser does not support the audio element.
-  
-#controls
-  button ng-click="horn()" Horn
-  div ui-slider="true" min="-0.50" max="2.00" step="0.01" use-decimals=true ng-model="trains[0].controls.speed" ng-change="speedChanged()"
-    a href="#" style="left: 26%;"
