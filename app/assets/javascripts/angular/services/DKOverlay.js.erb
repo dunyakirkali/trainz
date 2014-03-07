@@ -1,9 +1,9 @@
 DKOverlay.prototype = new google.maps.OverlayView();
 function DKOverlay(bounds, map) {
-
+  this.speed = 0.1;
   this.bounds_ = bounds;
   this.setMap(map);  
-  
+  this.time = 0.0;
   this.xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
   this.path = d3.geo.path().projection(this.xy);
   this.vis;
@@ -32,8 +32,8 @@ DKOverlay.prototype.addPath = function() {
     that.pathLength = that.pathNode.getTotalLength();
     that.circles.push(that.group.append("circle").attr({ r: 10 }));
     
-    that.draw();
-  });
+    // d3.timer(that.draw);
+  })
 };
 
 DKOverlay.prototype.onAdd = function() {
@@ -52,17 +52,17 @@ DKOverlay.prototype.onAdd = function() {
   google.maps.event.addListener(map, 'center_changed', this.draw);
 };
 
-DKOverlay.prototype.draw = function() {         
+DKOverlay.prototype.draw = function() {  
+  if(!this.circles) return;
+  console.log('asd');       
+  this.time += this.speed;
+  var that = this;
  for(var i = 0; i < this.circles.length; i++) {
-   var t = 0.5;
-   var that = this;
 
     this.circles[i].attr({
-      
       fill: "#a32",
       transform: function () {
-         console.log("aa");  
-        var nT = t;
+        var nT = that.time;
         nT = nT - Math.floor(nT);
         var p = that.pathNode.getPointAtLength(that.pathLength * nT);
         var isoX = p.x;
@@ -74,8 +74,8 @@ DKOverlay.prototype.draw = function() {
 };
 
 DKOverlay.prototype.onRemove = function() {
-  this.vis.parentNode.removeChild(this.vis);
-  this.vis = null;
+  // this.vis.parentNode.removeChild(this.vis);
+  // this.vis = null;
 };
 
 trainzApp.factory('DKOverlay', function ($rootScope) {
