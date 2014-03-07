@@ -31,7 +31,6 @@ DKOverlay.prototype.addPath = function() {
     that.pathNode = d3.select(targetPath).selectAll('path').node();
     that.pathLength = that.pathNode.getTotalLength();
     that.circles.push(that.group.append("circle").attr({ r: 10 }));
-    
     // d3.timer(that.draw);
   })
 };
