@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby '2.0.0'
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.0.3'
 gem 'pg'
@@ -34,3 +36,7 @@ gem 'slim-rails', '~> 2.1.0'
 gem 'angularjs-rails'
 gem "d3-rails"
 gem "jquery-ui-rails", "~> 4.2.0"
+
+group :production do
+  gem 'rails_12factor'
+end
