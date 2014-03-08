@@ -707,7 +707,6 @@ trainzApp.service('D3Service', function () {
     group = vis.append("svg:g");
   
     targetPath = d3.selectAll('.route')[0][0];
-    console.log(targetPath); 
     pathNode = d3.select(targetPath).selectAll('path').node();
     pathLength = pathNode.getTotalLength();
   

@@ -1,7 +1,7 @@
 DKOverlay.prototype = new google.maps.OverlayView();
 
 function DKOverlay(map) {
-  this.speed = 0.001;
+  this.speed = 0.01;
   this.time = 0.0;
   this.gmap = map;
   this.div;
@@ -25,6 +25,9 @@ DKOverlay.prototype.onAdd = function() {
     var gBounds = d3.geo.bounds(json);
     var sw = new google.maps.LatLng(gBounds[0][1], gBounds[0][0])
     var ne = new google.maps.LatLng(gBounds[1][1], gBounds[1][0])
+    
+    that.center = d3.geo.centroid(json);
+    that.gmap.setCenter(new google.maps.LatLng(that.center[1], that.center[0]));
     that.bounds = new google.maps.LatLngBounds(sw, ne);
     that.addTrack(json.features);
     that.addTrain(null);
@@ -36,23 +39,23 @@ DKOverlay.prototype.onAdd = function() {
 };
 
 DKOverlay.prototype.addTrack = function(track) { 
-  
+  var overlayProjection = this.getProjection();
   var ne = this.bounds.getNorthEast(),
       sw = this.bounds.getSouthWest();
-      
   var tracks = this.svg.append("svg:g").attr("id", "tracks");
-  // console.log(parseInt(google.maps.geometry.spherical.computeDistanceBetween(ne, sw) * this.gmap.getZoom()));
-  var projection = d3.geo.mercator()
-    .scale(480000)
-    .translate([630700, 401100]);
-  var path = d3.geo.path().projection(projection);
-  
-  tracks.selectAll("path").data(track).enter().append("svg:path").attr("d", path).attr('class', 'track');
 
-  this.targetPath = d3.selectAll('#tracks')[0][0];
-  this.pathNode = d3.select(this.targetPath).selectAll('path').node();
-  this.pathLength = this.pathNode.getTotalLength();
+  var swc = overlayProjection.fromLatLngToDivPixel(sw);
+  var nec = overlayProjection.fromLatLngToDivPixel(ne);
   
+  var googleMapProjection = function(coordinates) {
+      var googleCoordinates = new google.maps.LatLng(coordinates[1], coordinates[0]);
+      var pixelCoordinates = overlayProjection.fromLatLngToDivPixel(googleCoordinates);
+      return [pixelCoordinates.x + (nec.x - swc.x)/2, pixelCoordinates.y + (swc.y - nec.y) /2];
+  }
+
+  var path = d3.geo.path().projection(googleMapProjection);
+  
+  tracks.selectAll("path").data(track).enter().append("svg:path").attr("d", path).attr('class', 'track');  
 };
 
 DKOverlay.prototype.addTrain = function(train) { 
@@ -66,41 +69,36 @@ DKOverlay.prototype.addTrain = function(train) {
 DKOverlay.prototype.draw = function() {  
   if(!this.dataLoaded) return;
   
-  // var bounds = d3.geo.bounds(this.json);
-  // console.log(bounds);
-  
-  
-  // var projection = d3.geo.mercator().rotate([-this.bounds.getCenter().lng(),0]).translate([0, 0]).scale(1);
-  // var path = d3.geo.path().projection(projection);
-  
   var ne = this.bounds.getNorthEast(),
       sw = this.bounds.getSouthWest();
-          
-  // var p1 = projection(bounds[1]),
-  //     p2 = projection(bounds[0]);
-       
-  // this.svg.select('#tracks').attr('transform', 
-  //         'scale('+ $('#d3map').width()/(p1[0]-p2[0])+','+$('#d3map').height()/(p2[1]-p1[1])+')'+
-  //         'translate('+(-p2[0])+','+(-p1[1])+') ');
-  //this.svg.select('#tracks').selectAll('path').attr('d', path);  
-  
+            
   var overlayProjection = this.getProjection();
 
   var swc = overlayProjection.fromLatLngToDivPixel(sw);
   var nec = overlayProjection.fromLatLngToDivPixel(ne);
   
-  console.log(swc, nec);
-
-  // Resize the image's div to fit the indicated dimensions.
+  var googleMapProjection = function(coordinates) {
+      var googleCoordinates = new google.maps.LatLng(coordinates[1], coordinates[0]);
+      var pixelCoordinates = overlayProjection.fromLatLngToDivPixel(googleCoordinates);
+      return [pixelCoordinates.x + (nec.x - swc.x)/2, pixelCoordinates.y];
+  }
+  
+  var path = d3.geo.path().projection(googleMapProjection);
+  this.svg.selectAll('path').attr('d', path);
+  this.targetPath = d3.selectAll('#tracks')[0][0];
+  this.pathNode = d3.select(this.targetPath).selectAll('path').node();
+  this.pathLength = this.pathNode.getTotalLength();
+  
+  
   $("#d3map").css('left', swc.x + 'px');
   $("#d3map").css('top', nec.y + 'px');
   $("#d3map").css('width', (nec.x - swc.x) + 'px');
   $("#d3map").css('height', (swc.y - nec.y) + 'px');
       
   this.time += this.speed;
+  
   var that = this;
- for(var i = 0; i < this.circles.length; i++) {
- 
+  for(var i = 0; i < this.circles.length; i++) {
     this.circles[i].attr({
       fill: "#a32",
       transform: function () {
