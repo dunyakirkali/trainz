@@ -674,8 +674,12 @@ trainzApp.service('D3Service', function () {
     var group;
 
   this.setSpeed = function(newSpeed) {
-    if(newSpeed == 0) return;
-    speed = parseFloat(newSpeed) / 100;
+    if(newSpeed != 0) {
+        speed = parseFloat(newSpeed) / 100;
+    } else {
+      speed = 0;
+    }
+    
   }
     
   this.init = function(){        

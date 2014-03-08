@@ -32,7 +32,7 @@ DKOverlay.prototype.addTrack = function(track) {
   .enter()
   .append("svg:path")
   .attr("stroke", "#333")
-  .attr("fill", "#EBEFF2");
+  .attr("fill", "#FF2");
   this.targetPath = d3.selectAll('.route')[0][0];
   this.pathNode = d3.select(targetPath).selectAll('path').node();
   this.pathLength = this.pathNode.getTotalLength();
@@ -71,16 +71,17 @@ DKOverlay.prototype.draw = function() {
   var p1 = projection([ne.lng(),ne.lat()]),
       p2 = projection([sw.lng(),sw.lat()]);
   
-  this.tracks_group.attr('transform', 
-      'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')' +
-      'translate('+(-p2[0])+','+(+p1[1])+') ');
       
-      console.log($('.tracks').width() / (p1[0]-p2[0]));
+  this.tracks_group.attr('transform', 
+      'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')');
+      // 'translate('+(-p2[0])+','+(+p1[1])+') ');
+      
+      // console.log($('.tracks').width() / (p1[0]-p2[0]));
       
   this.group.attr('transform', 
       // 'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')' +
       'translate('+(-p2[0])+','+(+p1[1])+') ');
-  this.vis.selectAll('path').attr('d', path);
+  // this.vis.selectAll('path').attr('d', path);
  
   this.time += this.speed;
   var that = this;
