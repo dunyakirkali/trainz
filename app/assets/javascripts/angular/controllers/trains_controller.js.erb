@@ -22,7 +22,7 @@ function ($scope, D3Service, AudioService, DKOverlay) {
     
     var mapOptions = { 
       zoom: 14, 
-      center: new google.maps.LatLng(sPoint.y, sPoint.x),
+      center: new google.maps.LatLng(43.093336741, -75.194946527),
       mapTypeControlOptions: {
          mapTypeIds: []
       },
@@ -39,7 +39,7 @@ function ($scope, D3Service, AudioService, DKOverlay) {
       if(!$scope.timer) {
         $scope.timer = setInterval(function() {
           $scope.overlay.draw();
-        },30);
+        },500);
       }
     });
   };

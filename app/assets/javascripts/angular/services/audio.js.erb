@@ -4,7 +4,6 @@ trainzApp.service('AudioService', function () {
   this.volume = 50; // 0-100
   
   this.play = function() {
-    console.log('play');
     this.sound.play().fadeIn();
   }
   
@@ -20,7 +19,6 @@ trainzApp.service('AudioService', function () {
   
   this.setSpeed = function(speed) {
     if(!this.track) return;
-    console.log(speed);
     this.track.setSpeed(speed);
   }
   

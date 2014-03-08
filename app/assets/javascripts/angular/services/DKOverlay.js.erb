@@ -11,6 +11,7 @@ function DKOverlay(map) {
   this.pathNode;
   this.pathLength;
   this.dataLoaded = false;
+  this.bounds;
 }
 
 DKOverlay.prototype.onAdd = function() {
@@ -21,8 +22,12 @@ DKOverlay.prototype.onAdd = function() {
   this.svg = this.div.append('svg:svg');
 
   d3.json("<%= asset_path 'track.json' %>", function(json) {
-    console.log(json.features);
+    var gBounds = d3.geo.bounds(json);
+    var sw = new google.maps.LatLng(gBounds[0][1], gBounds[0][0])
+    var ne = new google.maps.LatLng(gBounds[1][1], gBounds[1][0])
+    that.bounds = new google.maps.LatLngBounds(sw, ne);
     that.addTrack(json.features);
+    that.addTrain(null);
     that.dataLoaded = true;
   });
      
@@ -31,11 +36,27 @@ DKOverlay.prototype.onAdd = function() {
 };
 
 DKOverlay.prototype.addTrack = function(track) { 
+  
+  var ne = this.bounds.getNorthEast(),
+      sw = this.bounds.getSouthWest();
+      
   var tracks = this.svg.append("svg:g").attr("id", "tracks");
-  tracks.selectAll("path").data(track).enter().append("svg:path").attr('class', 'track');
-  // this.targetPath = d3.selectAll('#tracks')[0][0];
-  // this.pathNode = d3.select(this.targetPath).selectAll('path').node();
-  // this.pathLength = this.pathNode.getTotalLength();
+  // console.log(parseInt(google.maps.geometry.spherical.computeDistanceBetween(ne, sw) * this.gmap.getZoom()));
+  var projection = d3.geo.mercator()
+    .scale(480000)
+    .translate([630700, 401100]);
+  var path = d3.geo.path().projection(projection);
+  
+  tracks.selectAll("path").data(track).enter().append("svg:path").attr("d", path).attr('class', 'track');
+
+  this.targetPath = d3.selectAll('#tracks')[0][0];
+  this.pathNode = d3.select(this.targetPath).selectAll('path').node();
+  this.pathLength = this.pathNode.getTotalLength();
+  
+};
+
+DKOverlay.prototype.addTrain = function(train) { 
+  this.circles.push(this.svg.append("circle").attr({ r: 10 }));
 };
 
 
@@ -45,48 +66,53 @@ DKOverlay.prototype.addTrack = function(track) {
 DKOverlay.prototype.draw = function() {  
   if(!this.dataLoaded) return;
   
-  var bounds = this.gmap.getBounds();
-  var projection = d3.geo.mercator().rotate([-bounds.getCenter().lng(),0]).translate([0, 0]).scale(1);
-  var path = d3.geo.path().projection(projection);
+  // var bounds = d3.geo.bounds(this.json);
+  // console.log(bounds);
   
-  var ne = bounds.getNorthEast(),
-      sw = bounds.getSouthWest();
+  
+  // var projection = d3.geo.mercator().rotate([-this.bounds.getCenter().lng(),0]).translate([0, 0]).scale(1);
+  // var path = d3.geo.path().projection(projection);
+  
+  var ne = this.bounds.getNorthEast(),
+      sw = this.bounds.getSouthWest();
           
-  var p1 = projection([ne.lng(),ne.lat()]),
-      p2 = projection([sw.lng(),sw.lat()]);
+  // var p1 = projection(bounds[1]),
+  //     p2 = projection(bounds[0]);
        
   // this.svg.select('#tracks').attr('transform', 
   //         'scale('+ $('#d3map').width()/(p1[0]-p2[0])+','+$('#d3map').height()/(p2[1]-p1[1])+')'+
   //         'translate('+(-p2[0])+','+(-p1[1])+') ');
-  this.svg.select('#tracks').selectAll('path').attr('d', path);  
+  //this.svg.select('#tracks').selectAll('path').attr('d', path);  
+  
+  var overlayProjection = this.getProjection();
+
+  var swc = overlayProjection.fromLatLngToDivPixel(sw);
+  var nec = overlayProjection.fromLatLngToDivPixel(ne);
+  
+  console.log(swc, nec);
+
+  // Resize the image's div to fit the indicated dimensions.
+  $("#d3map").css('left', swc.x + 'px');
+  $("#d3map").css('top', nec.y + 'px');
+  $("#d3map").css('width', (nec.x - swc.x) + 'px');
+  $("#d3map").css('height', (swc.y - nec.y) + 'px');
       
-  // this.tracks_group.attr('transform', 
-  //     'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')');
-  //     // 'translate('+(-p2[0])+','+(+p1[1])+') ');
-  //     
-  //     // console.log($('.tracks').width() / (p1[0]-p2[0]));
-  //     
-  // this.group.attr('transform', 
-  //     // 'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')' +
-  //     'translate('+(-p2[0])+','+(+p1[1])+') ');
-  // this.vis.selectAll('path').attr('d', path);
- // 
- //  this.time += this.speed;
- //  var that = this;
- // for(var i = 0; i < this.circles.length; i++) {
- // 
- //    this.circles[i].attr({
- //      fill: "#a32",
- //      transform: function () {
- //        var nT = that.time;
- //        nT = nT - Math.floor(nT);
- //        var p = that.pathNode.getPointAtLength(that.pathLength * nT);
- //        var isoX = p.x;
- //        var isoY = p.y;
- //        return "translate(" + [isoX, isoY] + ")";
- //      }
- //    });//.attr('transform', 'translate('+(-p2[0])+','+(+p1[1])+') ');
- //  }
+  this.time += this.speed;
+  var that = this;
+ for(var i = 0; i < this.circles.length; i++) {
+ 
+    this.circles[i].attr({
+      fill: "#a32",
+      transform: function () {
+        var nT = that.time;
+        nT = nT - Math.floor(nT);
+        var p = that.pathNode.getPointAtLength(that.pathLength * nT);
+        var isoX = p.x;
+        var isoY = p.y;
+        return "translate(" + [isoX, isoY] + ")";
+      }
+    });
+  }
 };
 
 DKOverlay.prototype.onRemove = function() {  
