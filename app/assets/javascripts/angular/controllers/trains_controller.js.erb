@@ -5,7 +5,6 @@ function ($scope, D3Service, AudioService, DKOverlay) {
     controls: {
       speed: 0.0001
     }
-    // carriages: 
   }];
   $scope.timer;
   
@@ -15,6 +14,7 @@ function ($scope, D3Service, AudioService, DKOverlay) {
     
   $scope.speedChanged = function() {
     D3Service.setSpeed($scope.trains[0].controls.speed);
+    AudioService.setSpeed($scope.trains[0].controls.speed);
   };
   
   $scope.initDrawMap = function() {

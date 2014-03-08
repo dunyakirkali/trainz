@@ -1,0 +1,28 @@
+trainzApp.service('AudioService', function () {
+  this.sound;
+  this.track;
+  this.volume = 50; // 0-100
+  
+  this.play = function() {
+    console.log('play');
+    this.sound.play().fadeIn();
+  }
+  
+  this.init = function() {
+    this.sound = new buzz.sound( "<%= asset_path 'triplex-norm.mp3' %>");
+    this.track = new buzz.sound( "<%= asset_path 'track.wav' %>");
+    
+    this.sound.setVolume(this.volume);
+    this.sound.setVolume(this.volume);
+    
+    this.track.play().fadeIn().loop();
+  }
+  
+  this.setSpeed = function(speed) {
+    if(!this.track) return;
+    console.log(speed);
+    this.track.setSpeed(speed);
+  }
+  
+  return this;
+});
