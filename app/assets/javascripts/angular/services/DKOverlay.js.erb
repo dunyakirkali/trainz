@@ -1,9 +1,7 @@
 DKOverlay.prototype = new google.maps.OverlayView();
-function DKOverlay(bounds, map) {
-  this.speed = 0.1;
-  this.bounds_ = bounds;
-  this.setMap(map);  
-  this.time = 0.0;
+function DKOverlay(map) {
+  this.speed = 0.001;
+  this.time = 0.5;
   this.xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
   this.path = d3.geo.path().projection(this.xy);
   this.vis;
@@ -11,53 +9,76 @@ function DKOverlay(bounds, map) {
   this.circles = [];    
   this.pathNode;
   this.pathLength;
+  this.gmap = map;
 }
 
-DKOverlay.prototype.addPath = function() {  
-  var that = this;  
-  d3.json("<%= asset_path 'track.json' %>", function(json) {
-    that.vis.append("svg:g")
-    .attr("class", "route")
-    .selectAll("path")
-    .data(json.features)
-    .enter()
-    .append("svg:path")
-    .attr("d", that.path)
-    .attr("stroke", "#333")
-    .attr("fill", "#EBEFF2");
-    
-    that.group = that.vis.append("svg:g");
-    var targetPath = d3.selectAll('.route')[0][0];
-    that.pathNode = d3.select(targetPath).selectAll('path').node();
-    that.pathLength = that.pathNode.getTotalLength();
-    that.circles.push(that.group.append("circle").attr({ r: 10 }));
-    // d3.timer(that.draw);
-  })
+DKOverlay.prototype.hide = function() {
+  if (this.vis) {
+    // The visibility property must be a string enclosed in quotes.
+    this.vis.style.visibility = 'hidden';
+  }
+};
+
+DKOverlay.prototype.show = function() {
+  if (this.vis) {
+    this.vis.style.visibility = 'visible';
+  }
+};
+
+DKOverlay.prototype.addTrack = function(track) {  
+  this.vis.append("svg:g")
+  .attr("class", "route")
+  .selectAll("path")
+  .data(track)
+  .enter()
+  .append("svg:path")
+  .attr("d", this.path)
+  .attr("stroke", "#333")
+  .attr("fill", "#EBEFF2");
+  
+  this.group = this.vis.append("svg:g");
+  this.targetPath = d3.selectAll('.route')[0][0];
+  this.pathNode = d3.select(targetPath).selectAll('path').node();
+  this.pathLength = this.pathNode.getTotalLength();
+  this.circles.push(this.group.append("circle").attr({ r: 10 }));
 };
 
 DKOverlay.prototype.onAdd = function() {
 
-  this.vis = d3.select(this.getPanes().overlayLayer).append('div')
-                .attr('id','d3map')
-                .style('width', '600px')
-                .style('height', '400px')
-            .append('svg')
-                .attr('width', 600)
-                .attr('height', 400);
-                
-  this.addPath();
+  this.vis = d3.select(this.getPanes().overlayLayer).append("div").attr("class", "tracks").append('svg:svg').attr('width', 800)
+                .attr('height', 800);;
+
+  var that = this;
+  d3.json("<%= asset_path 'track.json' %>", function(json) {
+    that.addTrack(json.features);
     
+  });
+     
   google.maps.event.addListener(map, 'bounds_changed', this.draw);
   google.maps.event.addListener(map, 'center_changed', this.draw);
 };
 
 DKOverlay.prototype.draw = function() {  
-  if(!this.circles) return;
-  console.log('asd');       
+  // this.setMap(null);
+  // this.setMap(this.gmap);
+  var bounds = this.gmap.getBounds(),
+      ne = bounds.getNorthEast(),
+      sw = bounds.getSouthWest(),
+      projection = d3.geo.mercator().rotate([-bounds.getCenter().lng(),0]).scale(1).translate([0, 0]),
+      path = d3.geo.path().projection(projection);
+          
+  var p1 = projection([ne.lng(),ne.lat()]),
+      p2 = projection([sw.lng(),sw.lat()]);
+  
+  this.vis.attr('transform', 
+      'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')' +
+      'translate('+(-p2[0])+','+(+p1[1])+') ');
+  d3.select(this.targetPath).selectAll('path').attr('d', path);
+ 
   this.time += this.speed;
   var that = this;
  for(var i = 0; i < this.circles.length; i++) {
-
+ 
     this.circles[i].attr({
       fill: "#a32",
       transform: function () {
@@ -70,11 +91,13 @@ DKOverlay.prototype.draw = function() {
       }
     })
   }
+  
 };
 
-DKOverlay.prototype.onRemove = function() {
+DKOverlay.prototype.onRemove = function() {  
   // this.vis.parentNode.removeChild(this.vis);
   // this.vis = null;
+  // this.setMap(null);
 };
 
 trainzApp.factory('DKOverlay', function ($rootScope) {

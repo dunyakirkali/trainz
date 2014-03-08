@@ -7,6 +7,7 @@ function ($scope, D3Service, AudioService, DKOverlay) {
     }
     // carriages: 
   }];
+  $scope.timer;
   
   $scope.horn = function () {
     AudioService.play();
@@ -16,9 +17,9 @@ function ($scope, D3Service, AudioService, DKOverlay) {
     D3Service.setSpeed($scope.trains[0].controls.speed);
   };
   
-  console.log(480000 / 256 / Math.pow(13, 2));
   $scope.initDrawMap = function() {
     var sPoint = D3Service.startPoint();
+    
     var mapOptions = { 
       zoom: 14, 
       center: new google.maps.LatLng(sPoint.y, sPoint.x),
@@ -31,28 +32,16 @@ function ($scope, D3Service, AudioService, DKOverlay) {
       scrollwheel: false,
       disableDoubleClickZoom: true
     };
-    $scope.draw_map = new google.maps.Map(document.getElementById('google_map'), mapOptions);
-    
+    $scope.draw_map = new google.maps.Map(d3.select("#google_map").node(), mapOptions);
+    $scope.overlay = new DKOverlay($scope.draw_map);
+    $scope.overlay.setMap($scope.draw_map);  
     google.maps.event.addListener($scope.draw_map, 'idle', function() {
-      if(!$scope.overlay) {
-        $scope.overlay = new DKOverlay($scope.draw_map.getBounds(), $scope.draw_map);
+      if(!$scope.timer) {
+        $scope.timer = setInterval(function() {
+          $scope.overlay.draw();
+        },10);
       }
     });
-    
-    google.maps.event.addListener($scope.draw_map, 'heading_changed', function() {
-      console.log('heading_changed');
-      if($scope.overlay) {
-        $scope.overlay.draw();
-      }
-    });
-    
-    google.maps.event.addListener($scope.draw_map, 'bounds_changed', function() {
-      if($scope.overlay) {
-        // $scope.overlay.setBounds($scope.draw_map.getBounds());
-      }
-    });
-    
-
   };
   
   AudioService.init();
