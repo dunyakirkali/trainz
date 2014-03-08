@@ -1,15 +1,14 @@
 DKOverlay.prototype = new google.maps.OverlayView();
 function DKOverlay(map) {
   this.speed = 0.001;
-  this.time = 0.5;
-  this.xy = d3.geo.mercator().scale(480000).translate([630700, 401100]);
-  this.path = d3.geo.path().projection(this.xy);
+  this.time = 0.0;
+  this.gmap = map;
   this.vis;
   this.group;
   this.circles = [];    
   this.pathNode;
   this.pathLength;
-  this.gmap = map;
+  this.dataLoaded = false;
 }
 
 DKOverlay.prototype.hide = function() {
@@ -25,60 +24,67 @@ DKOverlay.prototype.show = function() {
   }
 };
 
-DKOverlay.prototype.addTrack = function(track) {  
-  this.vis.append("svg:g")
-  .attr("class", "route")
+DKOverlay.prototype.addTrack = function(track) { 
+  this.tracks_group = this.vis.append("svg:g").attr("class", "route");
+  this.tracks_group
   .selectAll("path")
   .data(track)
   .enter()
   .append("svg:path")
-  .attr("d", this.path)
   .attr("stroke", "#333")
   .attr("fill", "#EBEFF2");
-  
-  this.group = this.vis.append("svg:g");
   this.targetPath = d3.selectAll('.route')[0][0];
   this.pathNode = d3.select(targetPath).selectAll('path').node();
   this.pathLength = this.pathNode.getTotalLength();
+  
+  this.group = this.vis.append("svg:g");
   this.circles.push(this.group.append("circle").attr({ r: 10 }));
 };
 
 DKOverlay.prototype.onAdd = function() {
 
-  this.vis = d3.select(this.getPanes().overlayLayer).append("div").attr("class", "tracks").append('svg:svg').attr('width', 800)
-                .attr('height', 800);;
+  this.vis = d3.select(this.getPanes().overlayLayer).append("div").attr("class", "tracks").append('svg:svg');
 
   var that = this;
   d3.json("<%= asset_path 'track.json' %>", function(json) {
     that.addTrack(json.features);
+    that.dataLoaded = true;
     
   });
      
-  google.maps.event.addListener(map, 'bounds_changed', this.draw);
-  google.maps.event.addListener(map, 'center_changed', this.draw);
+  google.maps.event.addListener(map, 'bounds_changed', that.draw);
+  google.maps.event.addListener(map, 'center_changed', that.draw);
 };
 
 DKOverlay.prototype.draw = function() {  
-  // this.setMap(null);
-  // this.setMap(this.gmap);
-  var bounds = this.gmap.getBounds(),
-      ne = bounds.getNorthEast(),
-      sw = bounds.getSouthWest(),
-      projection = d3.geo.mercator().rotate([-bounds.getCenter().lng(),0]).scale(1).translate([0, 0]),
-      path = d3.geo.path().projection(projection);
+  if(!this.dataLoaded) return;
+  
+  this.bounds = this.gmap.getBounds();
+  this.xy = d3.geo.mercator().rotate([-this.bounds.getCenter().lng(),0]).scale(1).translate([0, 0]);
+  this.path = d3.geo.path().projection(this.xy);
+  
+  var ne = this.bounds.getNorthEast(),
+      sw = this.bounds.getSouthWest(),
+      path = d3.geo.path().projection(this.xy),
+      projection = this.xy;
           
   var p1 = projection([ne.lng(),ne.lat()]),
       p2 = projection([sw.lng(),sw.lat()]);
   
-  this.vis.attr('transform', 
+  this.tracks_group.attr('transform', 
       'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')' +
       'translate('+(-p2[0])+','+(+p1[1])+') ');
-  d3.select(this.targetPath).selectAll('path').attr('d', path);
+      
+      console.log($('.tracks').width() / (p1[0]-p2[0]));
+      
+  this.group.attr('transform', 
+      // 'scale(' + $('.tracks').width() / (p1[0]-p2[0]) + ',' + $('.tracks').height() / (p2[1] - p1[1]) + ')' +
+      'translate('+(-p2[0])+','+(+p1[1])+') ');
+  this.vis.selectAll('path').attr('d', path);
  
   this.time += this.speed;
   var that = this;
  for(var i = 0; i < this.circles.length; i++) {
- 
     this.circles[i].attr({
       fill: "#a32",
       transform: function () {
@@ -89,7 +95,7 @@ DKOverlay.prototype.draw = function() {
         var isoY = p.y;
         return "translate(" + [isoX, isoY] + ")";
       }
-    })
+    });//.attr('transform', 'translate('+(-p2[0])+','+(+p1[1])+') ');
   }
   
 };
