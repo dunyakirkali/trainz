@@ -1,7 +1,7 @@
 DKOverlay.prototype = new google.maps.OverlayView();
 
 function DKOverlay(map) {
-  this.speed = 0.01;
+  this.speed = 0;
   this.time = 0.0;
   this.gmap = map;
   this.div;
@@ -35,8 +35,8 @@ DKOverlay.prototype.onAdd = function() {
     that.dataLoaded = true;
   });
      
-  google.maps.event.addListener(map, 'bounds_changed', that.draw);
-  google.maps.event.addListener(map, 'center_changed', that.draw);
+  google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
+  google.maps.event.addListener(this.gmap, 'center_changed', this.draw);
 };
 
 DKOverlay.prototype.addTrack = function(track) { 
@@ -98,12 +98,13 @@ DKOverlay.prototype.draw = function() {
   $("#d3map").css('width', (nec.x - swc.x) + 'px');
   $("#d3map").css('height', (swc.y - nec.y) + 'px');
       
-  this.time += this.speed;
+      
+  this.time += (this.speed * 0.000277777778 * 30.0 / this.gmap.getMapScale() / this.pathLength);
   
   var that = this;
   for(var i = 0; i < this.circles.length; i++) {
-    this.circles[i].attr({
-      fill: "#a32",
+    this.circles[i].transition()
+      .duration(30).attr({
       transform: function () {
         var nT = that.time;
         nT = nT - Math.floor(nT);
