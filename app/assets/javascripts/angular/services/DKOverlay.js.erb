@@ -42,7 +42,7 @@ DKOverlay.prototype.onAdd = function() {
   });
      
   google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
-  google.maps.event.addListener(this.gmap, 'center_changed', this.draw);
+  google.maps.event.addListener(this.gmap, 'center_changed', this.redraw);
 };
 
 DKOverlay.prototype.addTrack = function(track) { 
@@ -87,11 +87,12 @@ DKOverlay.prototype.addTrain = function(train) {
 //
 // Draw
 //
-DKOverlay.prototype.tick = function() {  
+
+DKOverlay.prototype.draw = function() {  
   
 };
 
-DKOverlay.prototype.draw = function() {  
+DKOverlay.prototype.redraw = function() {
   if(!this.dataLoaded) return;
   
   var bounds = this.gmap.getBounds();
@@ -116,14 +117,13 @@ DKOverlay.prototype.draw = function() {
   this.pathNode = d3.select(this.targetPath).selectAll('path').node();
   this.pathLength = this.pathNode.getTotalLength();
   
+  this.time += (this.speed * 0.000277777778 * 30.0 / this.gmap.getMapScale() / this.pathLength);
   
   $("#d3map").css('left', swc.x + 'px');
   $("#d3map").css('top', nec.y + 'px');
   $("#d3map").css('width', (nec.x - swc.x) + 'px');
   $("#d3map").css('height', (swc.y - nec.y) + 'px');
       
-      
-  this.time += (this.speed * 0.000277777778 * 30.0 / this.gmap.getMapScale() / this.pathLength);
   
   var that = this;
   for(var i = 0; i < this.circles.length; i++) {
@@ -136,7 +136,7 @@ DKOverlay.prototype.draw = function() {
         var isoX = p.x;
         var isoY = p.y;
         if(that.follow && i == that.followIndex) {
-          that.gmap.setCenter(that.getProjection().fromContainerPixelToLatLng(new google.maps.Point(isoX,isoY)));
+          that.gmap.panTo(that.getProjection().fromContainerPixelToLatLng(new google.maps.Point(isoX,isoY)));
         }
         return "translate(" + [isoX, isoY] + ")";
       }

@@ -52,7 +52,7 @@ function ($scope, AudioService, DKOverlay) {
     google.maps.event.addListener($scope.draw_map, 'idle', function() {
       if(!$scope.timer) {
         $scope.timer = setInterval(function() {
-          $scope.overlay.draw();
+          $scope.overlay.redraw();
         },30);
       }
     });
