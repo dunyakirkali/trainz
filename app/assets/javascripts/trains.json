@@ -1,0 +1,11 @@
+[{
+  "name": "Dunya",
+  "speed": 0.0,
+  "carriages": [{
+    "type": "passenger",
+    "color": "#ffe"
+  },{
+    "type": "freight"
+    "color": "#02e"    
+  }]
+}]

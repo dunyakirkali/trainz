@@ -31,8 +31,11 @@ DKOverlay.prototype.onAdd = function() {
     that.gmap.setCenter(new google.maps.LatLng(that.center[1], that.center[0]));
     that.bounds = new google.maps.LatLngBounds(sw, ne);
     that.addTrack(json.features);
-    that.addTrain(null);
     that.dataLoaded = true;
+  });
+  
+  d3.json("<%= asset_path 'trains.json' %>", function(json) {
+    that.addTrain(json[0]);
   });
      
   google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
