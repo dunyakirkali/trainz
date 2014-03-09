@@ -1,0 +1,19 @@
+.row
+  .columns.small-12
+    h2.subheader Train
+.row#train_details
+  .columns.small-12.large-4.medium-4
+    p Name: {{ trains[0].name }}  
+    p Speed: {{ trains[0].controls.speed | number:0 }} km/h
+    div ui-slider="true" min="0" max="26500" step="0.1" use-decimals=true ng-model="trains[0].controls.speed" ng-change="speedChanged()"
+      a href="#" style="left: 26%;"    
+  .columns.small-12.large-8.medium-8  
+    #controls
+      .row
+        .columns.small-12
+          label Camera
+          input id="checkbox" type="checkbox" ng-model="trains[0].controls.follow" ng-change="followChanged()"
+            label for="checkbox" Follow
+      .row
+        .columns.small-12
+          button ng-click="horn()" Horn
