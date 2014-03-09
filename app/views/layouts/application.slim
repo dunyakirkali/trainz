@@ -8,5 +8,8 @@ html ng-app="trainzApp"
     = csrf_meta_tags
     
   body ng-controller="TrainsController"
+    h1 The G Train
+    p Train simulator for Google Maps using D3
+    = render 'settings'
     = yield
     = render 'footer'

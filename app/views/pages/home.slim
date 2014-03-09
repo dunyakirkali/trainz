@@ -1,9 +1,7 @@
-h1 The G Train
-p Train simulator for Google Maps using D3
-
+h2 Train
 #train_details
-  p Train name: {{ trains[0].name }}
-  p Train speed: {{ trains[0].controls.speed }}
+  p name: {{ trains[0].name }}
+  p speed: {{ trains[0].controls.speed }}
   
 #controls
   input type="checkbox" ng-model="trains[0].controls.follow" ng-change="followChanged()"
