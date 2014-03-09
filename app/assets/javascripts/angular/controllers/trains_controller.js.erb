@@ -3,7 +3,8 @@ function ($scope, D3Service, AudioService, DKOverlay) {
   $scope.trains = [{
     name: 'Dunya',
     controls: {
-      speed: 0.0001
+      speed: 0.0001,
+      follow: false
     }
   }];
   $scope.timer;
@@ -15,6 +16,10 @@ function ($scope, D3Service, AudioService, DKOverlay) {
   $scope.speedChanged = function() {
     D3Service.setSpeed($scope.trains[0].controls.speed);
     AudioService.setSpeed($scope.trains[0].controls.speed);
+  };
+  
+  $scope.followChanged = function() {
+    $scope.overlay.follow = $scope.trains[0].controls.follow;
   };
   
   $scope.initDrawMap = function() {

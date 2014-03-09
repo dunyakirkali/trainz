@@ -12,6 +12,7 @@ function DKOverlay(map) {
   this.pathLength;
   this.dataLoaded = false;
   this.bounds;
+  
 }
 
 DKOverlay.prototype.onAdd = function() {
@@ -109,6 +110,9 @@ DKOverlay.prototype.draw = function() {
         var p = that.pathNode.getPointAtLength(that.pathLength * nT);
         var isoX = p.x;
         var isoY = p.y;
+        if(that.follow) {
+          that.gmap.setCenter(that.getProjection().fromContainerPixelToLatLng(new google.maps.Point(isoX,isoY)));
+        }
         return "translate(" + [isoX, isoY] + ")";
       }
     });
