@@ -71,15 +71,11 @@ DKOverlay.prototype.addTrain = function(train) {
   
   for(var i = 0; i < train.carriages.length; i++) {
     var carriage = train.carriages[i];
-    this.circles.push( 
-      trains.append("circle").attr({ r: 10 }).attr('fill', carriage.color)
-    );
-    this.lengths.push(parseFloat(carriage.length));
-    this.texts.push(
-      this.circles[i].append("text")
+    this.circles[i] = trains.append("circle").attr({ r: 10 }).attr('fill', carriage.color);
+    this.lengths[i] = parseFloat(carriage.length);
+    this.texts[i] = this.circles[i].append("text")
        .attr("text-anchor", "middle")
-       .text(i)
-    );
+       .text(i);
   }
 };
 
@@ -130,7 +126,11 @@ DKOverlay.prototype.redraw = function() {
     this.circles[i].transition()
       .duration(30).attr({
       transform: function () {
-        var nT = that.time - (that.lengths[i] / that.gmap.getMapScale() / that.pathLength * i);
+        var total = 0;
+        $.each(that.lengths.slice(0, i+1),function() {
+            total += this;
+        });
+        var nT = that.time - (total / that.gmap.getMapScale() / that.pathLength);
         nT = nT - Math.floor(nT);
         var p = that.pathNode.getPointAtLength(that.pathLength * nT);
         var isoX = p.x;
@@ -140,7 +140,7 @@ DKOverlay.prototype.redraw = function() {
         }
         return "translate(" + [isoX, isoY] + ")";
       }
-    }).attr('r', this.lengths[i]  / this.gmap.getMapScale() / 2.0);
+    }).attr('r', Math.ceil(this.lengths[i]  / this.gmap.getMapScale() / 2.0));
   }
 };
 
