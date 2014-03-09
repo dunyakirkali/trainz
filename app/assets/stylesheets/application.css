@@ -28,6 +28,11 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+#google_map img
+{
+    max-width : none;
+}
     
 #d3map {
     /*pointer-events: none;*/
