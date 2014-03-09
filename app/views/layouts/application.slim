@@ -2,9 +2,9 @@ doctype html
 html ng-app="trainzApp"
   head
     title Trainz
-    = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
+    = stylesheet_link_tag    "application", media: "all"
     script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"    
-    = javascript_include_tag "application", "data-turbolinks-track" => true
+    = javascript_include_tag "application"
     = csrf_meta_tags
     
   body ng-controller="TrainsController"
