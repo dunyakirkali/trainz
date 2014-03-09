@@ -29,8 +29,9 @@ html, body {
     
 #d3map {
     /*pointer-events: none;*/
-/*    width: 100%;
-    height: 100%;*/
+    width: 100%;
+    height: 100%;
+/*    background-color:blue;*/
     -webkit-transform: none;
     position: relative;
     top: 0px;
@@ -40,15 +41,15 @@ html, body {
 #d3map svg {
   width: 100%;
   height: 100%;
-  background-color:red;
+/*  background-color:red;*/
 }
 
 #d3map path {
-  stroke: #333;
-  fill: #0F2;
+  stroke: red;
+  fill: transparent;
 }
 
 #d3map circle {
   stroke: #333;
-  fill: #0F2;
+/*  fill: #0F2;*/
 }
