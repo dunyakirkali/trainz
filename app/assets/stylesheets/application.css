@@ -51,6 +51,12 @@ html, body {
 /*  background-color:red;*/
 }
 
+#d3map text {
+  font: 20px sans-serif;
+  color:white;
+  pointer-events: none;
+}
+
 #d3map path {
   stroke: red;
   fill: transparent;

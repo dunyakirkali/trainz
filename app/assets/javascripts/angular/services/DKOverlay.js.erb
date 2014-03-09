@@ -7,12 +7,14 @@ function DKOverlay(map) {
   this.div;
   this.svg;
   this.group;
-  this.circles = [];    
+  this.circles = [];
+  this.lengths = [];
+  this.texts=[];
   this.pathNode;
   this.pathLength;
   this.dataLoaded = false;
   this.bounds;
-  
+  this.followIndex = 0;
 }
 
 DKOverlay.prototype.onAdd = function() {
@@ -31,11 +33,12 @@ DKOverlay.prototype.onAdd = function() {
     that.gmap.setCenter(new google.maps.LatLng(that.center[1], that.center[0]));
     that.bounds = new google.maps.LatLngBounds(sw, ne);
     that.addTrack(json.features);
+    
+    d3.json("<%= asset_path 'trains.json' %>", function(json) {
+      that.addTrain(json[0]);
+    });
+    
     that.dataLoaded = true;
-  });
-  
-  d3.json("<%= asset_path 'trains.json' %>", function(json) {
-    that.addTrain(json[0]);
   });
      
   google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
@@ -63,13 +66,31 @@ DKOverlay.prototype.addTrack = function(track) {
 };
 
 DKOverlay.prototype.addTrain = function(train) { 
-  this.circles.push(this.svg.append("circle").attr({ r: 10 }));
+  
+  var trains = this.svg.append("svg:g").attr("id", "trains");
+  
+  for(var i = 0; i < train.carriages.length; i++) {
+    var carriage = train.carriages[i];
+    this.circles.push( 
+      trains.append("circle").attr({ r: 10 }).attr('fill', carriage.color)
+    );
+    this.lengths.push(parseFloat(carriage.length));
+    this.texts.push(
+      this.circles[i].append("text")
+       .attr("text-anchor", "middle")
+       .text(i)
+    );
+  }
 };
 
 
 //
 // Draw
 //
+DKOverlay.prototype.tick = function() {  
+  
+};
+
 DKOverlay.prototype.draw = function() {  
   if(!this.dataLoaded) return;
   
@@ -109,17 +130,17 @@ DKOverlay.prototype.draw = function() {
     this.circles[i].transition()
       .duration(30).attr({
       transform: function () {
-        var nT = that.time;
+        var nT = that.time - (that.lengths[i] / that.gmap.getMapScale() / that.pathLength * i);
         nT = nT - Math.floor(nT);
         var p = that.pathNode.getPointAtLength(that.pathLength * nT);
         var isoX = p.x;
         var isoY = p.y;
-        if(that.follow) {
+        if(that.follow && i == that.followIndex) {
           that.gmap.setCenter(that.getProjection().fromContainerPixelToLatLng(new google.maps.Point(isoX,isoY)));
         }
         return "translate(" + [isoX, isoY] + ")";
       }
-    });
+    }).attr('r', this.lengths[i]  / this.gmap.getMapScale() / 2.0);
   }
 };
 
@@ -127,6 +148,10 @@ DKOverlay.prototype.onRemove = function() {
   // this.vis.parentNode.removeChild(this.vis);
   // this.vis = null;
   // this.setMap(null);
+};
+
+DKOverlay.prototype.setFollowIndex = function(fllwNdx) {  
+  this.followIndex = fllwNdx;
 };
 
 trainzApp.factory('DKOverlay', function ($rootScope) {

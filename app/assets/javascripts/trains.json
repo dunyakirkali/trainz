@@ -3,9 +3,51 @@
   "speed": 0.0,
   "carriages": [{
     "type": "passenger",
-    "color": "#ffe"
+    "color": "#253020",
+    "length": 31.0
   },{
-    "type": "freight"
-    "color": "#02e"    
+    "type": "freight",
+    "color": "#736243",
+    "length": 23.0
+  },{
+    "type": "freight",
+    "color": "#738C5A",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#738C5A",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#BFA575",
+    "length": 44.0
+  },{
+    "type": "freight",
+    "color": "#BFA575",
+    "length": 27
+  },{
+    "type": "freight",
+    "color": "#B5AB8D",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#738C5A",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#B5AB8D",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#BFA575",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#BFA575",
+    "length": 23
+  },{
+    "type": "freight",
+    "color": "#736243",
+    "length": 23
   }]
 }]

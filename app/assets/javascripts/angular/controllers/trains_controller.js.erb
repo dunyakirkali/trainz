@@ -8,6 +8,7 @@ function ($scope, AudioService, DKOverlay) {
     }
   }];
   $scope.timer;
+  $scope.followIndex = 0;
   
   $scope.horn = function () {
     AudioService.play();
@@ -21,6 +22,9 @@ function ($scope, AudioService, DKOverlay) {
   $scope.followChanged = function() {
     $scope.overlay.follow = $scope.trains[0].controls.follow;
   };
+  $scope.followIndexChanged = function() {
+    $scope.overlay.setFollowIndex($scope.followIndex);
+  };  
   
   $scope.initDrawMap = function() {    
     var mapOptions = { 

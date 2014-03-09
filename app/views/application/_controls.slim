@@ -14,6 +14,9 @@
           label Camera
           input id="checkbox" type="checkbox" ng-model="trains[0].controls.follow" ng-change="followChanged()"
             label for="checkbox" Follow
+          input id="number" type="number" ng-model="followIndex" ng-change="followIndexChanged()"
+          followIndex
+            label for="number" Carriage no          
       .row
         .columns.small-12
           button ng-click="horn()" Horn
