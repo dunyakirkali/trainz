@@ -41,8 +41,8 @@ DKOverlay.prototype.onAdd = function() {
     that.dataLoaded = true;
   });
      
-  google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
-  google.maps.event.addListener(this.gmap, 'center_changed', this.redraw);
+  // google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
+  // google.maps.event.addListener(this.gmap, 'center_changed', this.redraw);
 };
 
 DKOverlay.prototype.addTrack = function(track) { 
