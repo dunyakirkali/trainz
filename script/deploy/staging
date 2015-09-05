@@ -1,0 +1,7 @@
+#!/bin/bash
+set -x
+set -e
+
+git push git@heroku.com:trainz-staging.git develop:master
+heroku run rake db:migrate --app trainz-staging
+heroku run rake db:seed --app trainz-staging
