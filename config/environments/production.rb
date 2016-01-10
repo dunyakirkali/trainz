@@ -77,4 +77,6 @@ Trainz::Application.configure do
 
   # Add audio files to assets pipeline
   config.assets.precompile += %w( track.wav triplex-norm.mp3 73900^TRAIN.mp3 )
+
+  config.middleware.use Rack::GoogleAnalytics, tracker: ENV['GOOGLE_ANALYTICS_ID']
 end
