@@ -10,13 +10,7 @@ html ng-app="trainzApp"
     meta name="viewport" content="width=device-width, initial-scale=1.0"
     
   body ng-controller="TrainsController"
-    / div class="off-canvas-wrap"
-    /   div class="inner-wrap"
-    /     a class="left-off-canvas-toggle" href="#" Menu
-    /     aside class="left-off-canvas-menu"
     = render 'header'
     = render 'settings'
     = render 'controls'
     = yield
-    = render 'footer'
-      / a class="exit-off-canvas"
