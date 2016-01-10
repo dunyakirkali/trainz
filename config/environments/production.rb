@@ -20,9 +20,8 @@ Trainz::Application.configure do
   # config.action_dispatch.rack_cache = true
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = :uglifier
-  # config.assets.css_compressor = :sass
-
+  config.assets.js_compressor = Uglifier.new(mangle: false)
+  
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
@@ -79,6 +78,4 @@ Trainz::Application.configure do
   config.assets.precompile += %w( track.wav triplex-norm.mp3 73900^TRAIN.mp3 )
 
   config.middleware.use Rack::GoogleAnalytics, tracker: ENV['GOOGLE_ANALYTICS_ID']
-
-  config.assets.js_compressor = Uglifier.new(mangle: false)
 end
