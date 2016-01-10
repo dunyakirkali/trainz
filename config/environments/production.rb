@@ -79,4 +79,6 @@ Trainz::Application.configure do
   config.assets.precompile += %w( track.wav triplex-norm.mp3 73900^TRAIN.mp3 )
 
   config.middleware.use Rack::GoogleAnalytics, tracker: ENV['GOOGLE_ANALYTICS_ID']
+
+  config.assets.js_compressor = Uglifier.new(mangle: false)
 end
