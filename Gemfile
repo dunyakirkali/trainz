@@ -17,6 +17,7 @@ gem 'chosen-rails', '~> 1.1.0'
 gem 'carmen-rails', '~> 1.0.0'
 gem 'foundation-rails', '~> 5.2.0.0'
 gem 'compass-rails', '~> 2.0.4'
+gem 'rack-google-analytics', '~> 1.2.0'
 
 group :doc do
   gem 'sdoc', require: false
