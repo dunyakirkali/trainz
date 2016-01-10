@@ -20,7 +20,7 @@ function DKOverlay(map) {
 DKOverlay.prototype.onAdd = function() {
 
   var that = this;
-  
+
   this.div = d3.select(this.getPanes().overlayLayer).append("div").attr("id", "d3map");
   this.svg = this.div.append('svg:svg');
 
@@ -28,24 +28,24 @@ DKOverlay.prototype.onAdd = function() {
     var gBounds = d3.geo.bounds(json);
     var sw = new google.maps.LatLng(gBounds[0][1], gBounds[0][0])
     var ne = new google.maps.LatLng(gBounds[1][1], gBounds[1][0])
-    
+
     that.center = d3.geo.centroid(json);
     that.gmap.setCenter(new google.maps.LatLng(that.center[1], that.center[0]));
     that.bounds = new google.maps.LatLngBounds(sw, ne);
     that.addTrack(json.features);
-    
+
     d3.json("<%= asset_path 'trains.json' %>", function(json) {
       that.addTrain(json[0]);
     });
-    
+
     that.dataLoaded = true;
   });
-     
+
   // google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
   // google.maps.event.addListener(this.gmap, 'center_changed', this.redraw);
 };
 
-DKOverlay.prototype.addTrack = function(track) { 
+DKOverlay.prototype.addTrack = function(track) {
   var overlayProjection = this.getProjection();
   var ne = this.bounds.getNorthEast(),
       sw = this.bounds.getSouthWest();
@@ -53,7 +53,7 @@ DKOverlay.prototype.addTrack = function(track) {
 
   var swc = overlayProjection.fromLatLngToDivPixel(sw);
   var nec = overlayProjection.fromLatLngToDivPixel(ne);
-  
+
   var googleMapProjection = function(coordinates) {
       var googleCoordinates = new google.maps.LatLng(coordinates[1], coordinates[0]);
       var pixelCoordinates = overlayProjection.fromLatLngToDivPixel(googleCoordinates);
@@ -61,14 +61,14 @@ DKOverlay.prototype.addTrack = function(track) {
   }
 
   var path = d3.geo.path().projection(googleMapProjection);
-  
-  tracks.selectAll("path").data(track).enter().append("svg:path").attr("d", path).attr('class', 'track');  
+
+  tracks.selectAll("path").data(track).enter().append("svg:path").attr("d", path).attr('class', 'track');
 };
 
-DKOverlay.prototype.addTrain = function(train) { 
-  
+DKOverlay.prototype.addTrain = function(train) {
+
   var trains = this.svg.append("svg:g").attr("id", "trains");
-  
+
   for(var i = 0; i < train.carriages.length; i++) {
     var carriage = train.carriages[i];
     this.circles[i] = trains.append("circle").attr({ r: 10 }).attr('fill', carriage.color);
@@ -84,43 +84,43 @@ DKOverlay.prototype.addTrain = function(train) {
 // Draw
 //
 
-DKOverlay.prototype.draw = function() {  
-  
+DKOverlay.prototype.draw = function() {
+
 };
 
 DKOverlay.prototype.redraw = function() {
   if(!this.dataLoaded) return;
-  
+
   var bounds = this.gmap.getBounds();
-  // 
+  //
   var ne = bounds.getNorthEast(),
       sw = bounds.getSouthWest();
-  //           
+  //
   var overlayProjection = this.getProjection();
-  
+
   var swc = overlayProjection.fromLatLngToDivPixel(sw);
   var nec = overlayProjection.fromLatLngToDivPixel(ne);
-  // 
+  //
   var googleMapProjection = function(coordinates) {
       var googleCoordinates = new google.maps.LatLng(coordinates[1], coordinates[0]);
       var pixelCoordinates = overlayProjection.fromLatLngToContainerPixel(googleCoordinates);
       return [pixelCoordinates.x, pixelCoordinates.y];
   }
-  
+
   var path = d3.geo.path().projection(googleMapProjection);
   this.svg.selectAll('path').attr('d', path);
   this.targetPath = d3.selectAll('#tracks')[0][0];
   this.pathNode = d3.select(this.targetPath).selectAll('path').node();
   this.pathLength = this.pathNode.getTotalLength();
-  
+
   this.time += (this.speed * 0.000277777778 * 30.0 / this.gmap.getMapScale() / this.pathLength);
-  
+
   $("#d3map").css('left', swc.x + 'px');
   $("#d3map").css('top', nec.y + 'px');
   $("#d3map").css('width', (nec.x - swc.x) + 'px');
   $("#d3map").css('height', (swc.y - nec.y) + 'px');
-      
-  
+
+
   var that = this;
   for(var i = 0; i < this.circles.length; i++) {
     this.circles[i].transition()
@@ -144,16 +144,16 @@ DKOverlay.prototype.redraw = function() {
   }
 };
 
-DKOverlay.prototype.onRemove = function() {  
+DKOverlay.prototype.onRemove = function() {
   // this.vis.parentNode.removeChild(this.vis);
   // this.vis = null;
   // this.setMap(null);
 };
 
-DKOverlay.prototype.setFollowIndex = function(fllwNdx) {  
+DKOverlay.prototype.setFollowIndex = function(fllwNdx) {
   this.followIndex = fllwNdx;
 };
 
-trainzApp.factory('DKOverlay', function ($rootScope) {
+trainzApp.factory('DKOverlay', ['$rootScope', function ($rootScope) {
   return DKOverlay;
-});
+}]);
