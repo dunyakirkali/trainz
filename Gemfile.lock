@@ -157,16 +157,16 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  angularjs-rails
+  angularjs-rails (~> 1.2.10)
   carmen-rails (~> 1.0.0)
-  chosen-rails
+  chosen-rails (~> 1.1.0)
   coffee-rails (~> 4.0.0)
-  d3-rails
-  foundation-rails
+  d3-rails (~> 3.3.7)
+  foundation-rails (~> 5.2.0.0)
   jbuilder (~> 1.2)
-  jquery-rails
+  jquery-rails (~> 3.1.0)
   jquery-ui-rails (~> 4.2.0)
-  pg
+  pg (~> 0.17.1)
   rails (= 4.0.13)
   rails_12factor
   rspec-rails
