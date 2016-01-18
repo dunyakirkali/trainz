@@ -15,7 +15,6 @@ gem 'd3-rails', '~> 3.3.7'
 gem 'jquery-ui-rails', '~> 4.2.0'
 gem 'chosen-rails', '~> 1.1.0'
 gem 'carmen-rails', '~> 1.0.0'
-gem 'foundation-rails', '~> 5.2.0.0'
 gem 'compass-rails', '~> 2.0.4'
 gem 'rack-google-analytics', '~> 1.2.0'
 
@@ -29,4 +28,8 @@ end
 
 group :test do
   gem 'rspec-rails'
+end
+
+source 'https://rails-assets.org' do
+  gem 'rails-assets-foundation'
 end
