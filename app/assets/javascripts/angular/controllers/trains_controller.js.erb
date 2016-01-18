@@ -1,5 +1,5 @@
 trainzApp.controller('TrainsController', ['$scope', 'AudioService', 'DKOverlay',
-function ($scope, AudioService, DKOverlay) {  
+function ($scope, AudioService, DKOverlay) {
   $scope.trains = [{
     name: 'Dunya',
     controls: {
@@ -9,26 +9,26 @@ function ($scope, AudioService, DKOverlay) {
   }];
   $scope.timer;
   $scope.followIndex = 0;
-  
+
   $scope.horn = function () {
     AudioService.play();
   };
-    
+
   $scope.speedChanged = function() {
     AudioService.setSpeed($scope.trains[0].controls.speed / 350.);
     $scope.overlay.speed = $scope.trains[0].controls.speed;
   };
-  
+
   $scope.followChanged = function() {
     $scope.overlay.follow = $scope.trains[0].controls.follow;
   };
   $scope.followIndexChanged = function() {
     $scope.overlay.setFollowIndex($scope.followIndex);
-  };  
-  
-  $scope.initDrawMap = function() {    
-    var mapOptions = { 
-      zoom: 14, 
+  };
+
+  $scope.initDrawMap = function() {
+    var mapOptions = {
+      zoom: 14,
       center: new google.maps.LatLng(43.093336741, -75.194946527),
       mapTypeControlOptions: {
          mapTypeIds: []
@@ -48,7 +48,7 @@ function ($scope, AudioService, DKOverlay) {
         return scale;
     }
     $scope.overlay = new DKOverlay($scope.draw_map);
-    $scope.overlay.setMap($scope.draw_map);  
+    $scope.overlay.setMap($scope.draw_map);
     google.maps.event.addListener($scope.draw_map, 'idle', function() {
       if(!$scope.timer) {
         $scope.timer = setInterval(function() {
@@ -57,8 +57,8 @@ function ($scope, AudioService, DKOverlay) {
       }
     });
   };
-  
+
   AudioService.init();
-  
+
   $scope.initDrawMap();
 }]);

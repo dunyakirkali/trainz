@@ -13,8 +13,7 @@
 //= require jquery
 //= require jquery.ui.all
 //= require jquery_ujs
-//= require chosen-jquery
-//= require angular
+//= require angularjs
 //= require chosen
 //= require slider
 //= require d3
@@ -25,5 +24,22 @@
 //= require angular/services/DKOverlay
 //= require foundation
 
-$(document).foundation();
+$(function() {
+  $(document).foundation();
 
+  $('body').append('<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>');
+  var resizeTimer = false;
+  var insertAdsenseAd = function() {
+    $('.ads').html('<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7498782896502186" data-ad-slot="6899885355" data-ad-format="auto"></ins>');
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  };
+
+  insertAdsenseAd();
+
+  $(window).on('resize', function() {
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+    }
+    resizeTimer = setTimeout(insertAdsenseAd, 250);
+  });
+});

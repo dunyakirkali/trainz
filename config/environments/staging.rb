@@ -74,4 +74,6 @@ Trainz::Application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+
+  config.assets.precompile += %w( track.wav triplex-norm.mp3 73900^TRAIN.mp3 )
 end
