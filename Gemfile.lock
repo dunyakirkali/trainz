@@ -100,6 +100,9 @@ GEM
       bundler (>= 1.3.0, < 2.0)
       railties (= 4.0.13)
       sprockets-rails (~> 2.0)
+    rails-assets-buzz (1.1.10)
+    rails-assets-chosen (1.4.2)
+      rails-assets-jquery (>= 1.4.4)
     rails-assets-fastclick (1.0.6)
     rails-assets-foundation (5.5.3)
       rails-assets-fastclick (>= 0.6.11)
@@ -198,6 +201,8 @@ DEPENDENCIES
   pg (~> 0.17.1)
   rack-google-analytics (~> 1.2.0)
   rails (= 4.0.13)
+  rails-assets-buzz!
+  rails-assets-chosen!
   rails-assets-foundation!
   rails_12factor
   rspec-rails

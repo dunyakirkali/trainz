@@ -32,4 +32,6 @@ end
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-foundation'
+  gem 'rails-assets-buzz'
+  gem 'rails-assets-chosen'
 end
