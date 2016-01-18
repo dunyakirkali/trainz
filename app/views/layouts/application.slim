@@ -1,13 +1,14 @@
 doctype html
-html ng-app="trainzApp"
+html lang="en" ng-app="trainzApp"
   head
-    title Trainz
-    = javascript_include_tag "vendor/modernizr"
-    = stylesheet_link_tag    "application", media: "all"
-    script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry"    
-    = javascript_include_tag "application"
-    = csrf_meta_tags
+    meta charset="utf-8"
     meta name="viewport" content="width=device-width, initial-scale=1.0"
+    title Trainz
+    
+    = stylesheet_link_tag "application", media: "all"
+    = javascript_include_tag "https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry", "application"
+
+    = csrf_meta_tags
     
   body ng-controller="TrainsController"
     = render 'header'
@@ -15,5 +16,4 @@ html ng-app="trainzApp"
     = render 'controls'
     = yield
     .row
-      .columns.small-4.push-4
-        = render 'ad'
+      .columns.small-12.ads
