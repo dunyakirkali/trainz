@@ -1,4 +1,4 @@
-trainzApp.service('AudioService', function () {
+trainzApp.service('AudioService', [function () {
   this.sound;
   this.track;
   this.volume = 50; // 0-100
@@ -23,4 +23,4 @@ trainzApp.service('AudioService', function () {
   }
 
   return this;
-});
+}]);
