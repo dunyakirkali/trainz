@@ -1,1 +1,1 @@
-var trainzApp = angular.module('trainzApp', ['ui.slider', 'localytics.directives']);
+var trainzApp = angular.module('trainzApp', ['ui.slider']);
