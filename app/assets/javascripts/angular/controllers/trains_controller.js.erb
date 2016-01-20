@@ -10,6 +10,8 @@ function ($scope, AudioService, DKOverlay) {
   $scope.timer;
   $scope.followIndex = 0;
   $scope.country = 'Netherlands';
+  $scope.company = 'Amtrak';
+  $scope.companies = ['Amtrak', 'NS'];
   $scope.countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas"
 		,"Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands"
 		,"Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica"
@@ -65,8 +67,20 @@ function ($scope, AudioService, DKOverlay) {
       disableDoubleClickZoom: true
     };
     $scope.draw_map = new google.maps.Map(d3.select("#google_map").node(), mapOptions);
+
+    // Layers
     var transitLayer = new google.maps.TransitLayer();
     transitLayer.setMap($scope.draw_map);
+
+    var kmlLayer = new google.maps.KmlLayer();
+    var kmlUrl = 'https://developers.google.com/maps/tutorials/kml/westcampus.kml';
+    var kmlOptions = {
+      suppressInfoWindows: true,
+      preserveViewport: false,
+      map: $scope.draw_map
+    };
+    var kmlLayer = new google.maps.KmlLayer(kmlUrl, kmlOptions);
+
     google.maps.Map.prototype.getMapScale = function () {
         var circumference = 40075040, zoom, lat, scale;
         zoom = this.getZoom();
@@ -83,6 +97,14 @@ function ($scope, AudioService, DKOverlay) {
         },30);
       }
     });
+  };
+
+  $scope.displayCompany = function(company) {
+    console.log(company);
+  };
+
+  $scope.displayTrain = function(train) {
+    console.log(train);
   };
 
   AudioService.init();
