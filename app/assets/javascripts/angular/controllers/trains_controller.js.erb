@@ -65,6 +65,8 @@ function ($scope, AudioService, DKOverlay) {
       disableDoubleClickZoom: true
     };
     $scope.draw_map = new google.maps.Map(d3.select("#google_map").node(), mapOptions);
+    var transitLayer = new google.maps.TransitLayer();
+    transitLayer.setMap($scope.draw_map);
     google.maps.Map.prototype.getMapScale = function () {
         var circumference = 40075040, zoom, lat, scale;
         zoom = this.getZoom();
