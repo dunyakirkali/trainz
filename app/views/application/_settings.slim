@@ -4,6 +4,6 @@
     p Start by picking a country and the specific train company that you would like to control.
 .row
   .columns.large-6.small-12.medium-6
-    = select_tag "country", country_select_options, { :chosen => 'true' }
+    select name="country" ng-model="country" required=true ng-options="country as country for country in countries" ng-change='focusOnCountry(country)'
   .columns.large-6.small-12.medium-6
-    = select_tag "company", company_select_options, { :chosen => 'true' }
+    = select_tag "company", company_select_options, { chosen: 'true' }
