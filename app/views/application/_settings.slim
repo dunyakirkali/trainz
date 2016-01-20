@@ -3,7 +3,9 @@
     h2.subheader Settings
     p Start by picking a country and the specific train company that you would like to control.
 .row
-  .columns.large-6.small-12.medium-6
+  .columns.large-4.small-12.medium-4
     select name="country" ng-model="country" required=true ng-options="country as country for country in countries" ng-change='focusOnCountry(country)'
-  .columns.large-6.small-12.medium-6
-    = select_tag "company", company_select_options, { chosen: 'true' }
+  .columns.large-4.small-12.medium-4
+    select name="company" ng-model="company" required=true ng-options="company as company for company in companies" ng-change='displayCoompany(company)'
+  .columns.large-4.small-12.medium-4
+    select name="train" ng-model="train" required=true ng-options="train.name as train.name for train in trains" ng-change='displayTrain(train)'
