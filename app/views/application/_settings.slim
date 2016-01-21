@@ -6,6 +6,6 @@
   .columns.large-4.small-12.medium-4
     select name="country" ng-model="country" required=true ng-options="country as country for country in countries" ng-change='focusOnCountry(country)'
   .columns.large-4.small-12.medium-4
-    select name="company" ng-model="company" required=true ng-options="company as company for company in companies" ng-change='displayCoompany(company)'
+    select name="company" ng-model="company" required=true ng-options="company.name as company.name for company in companies" ng-change='displayCompany(company)'
   .columns.large-4.small-12.medium-4
-    select name="train" ng-model="train" required=true ng-options="train.name as train.name for train in trains" ng-change='displayTrain(train)'
+    select ng-model="train" ng-options="train as train.name for train in trains" ng-change='displayTrain()'

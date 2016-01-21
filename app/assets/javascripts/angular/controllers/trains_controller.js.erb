@@ -1,17 +1,22 @@
-trainzApp.controller('TrainsController', ['$scope', 'AudioService', 'DKOverlay',
-function ($scope, AudioService, DKOverlay) {
+trainzApp.controller('TrainsController', ['$scope', 'AudioService', 'DKOverlay', 'osmAPI', 'overpassAPI',
+function ($scope, AudioService, DKOverlay, osmAPI, overpassAPI) {
+  // Trains
   $scope.trains = [{
-    name: 'Dunya',
+    name: '17400 Breukelen-Veenendaal',
+    osm_id: '1860734',
     controls: {
       speed: 0.0001,
       follow: false
     }
   }];
+  $scope.train;
+
   $scope.timer;
   $scope.followIndex = 0;
+  $scope.routes = []
+
+  // Countries
   $scope.country = 'Netherlands';
-  $scope.company = 'Amtrak';
-  $scope.companies = ['Amtrak', 'NS'];
   $scope.countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas"
 		,"Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands"
 		,"Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica"
@@ -28,6 +33,12 @@ function ($scope, AudioService, DKOverlay) {
 		,"Turkey","Turkmenistan","Turks &amp; Caicos","Uganda","Ukraine","United Arab Emirates","United Kingdom","Uruguay","Uzbekistan","Venezuela","Vietnam","Virgin Islands (US)"
 		,"Yemen","Zambia","Zimbabwe"];
 
+  // Operators
+  $scope.company = {
+    name: 'NS'
+  }
+  $scope.companies = [{ name: 'NS'}];
+
   $scope.horn = function () {
     AudioService.play();
   };
@@ -38,6 +49,9 @@ function ($scope, AudioService, DKOverlay) {
       if (status == google.maps.GeocoderStatus.OK) {
         $scope.draw_map.fitBounds(results[0].geometry.bounds);
         $scope.draw_map.setCenter(results[0].geometry.location);
+        overpassAPI.overpass('relation(50.745,7.17,50.75,7.18)[route=train];out;').then(function(data) {
+          console.log('relation:', data);
+        });
       } else {
         alert("Coul not Geocode because: " + status);
       }
@@ -64,22 +78,30 @@ function ($scope, AudioService, DKOverlay) {
       draggable: false,
       zoomControl: true,
       scrollwheel: false,
-      disableDoubleClickZoom: true
+      disableDoubleClickZoom: true,
+      mapTypeControlOptions: {
+        mapTypeIds: ['Map', 'Satellite', 'OpenStreetMap']
+      }
     };
     $scope.draw_map = new google.maps.Map(d3.select("#google_map").node(), mapOptions);
 
     // Layers
-    var transitLayer = new google.maps.TransitLayer();
-    transitLayer.setMap($scope.draw_map);
-
-    var kmlLayer = new google.maps.KmlLayer();
-    var kmlUrl = 'https://developers.google.com/maps/tutorials/kml/westcampus.kml';
-    var kmlOptions = {
-      suppressInfoWindows: true,
-      preserveViewport: false,
-      map: $scope.draw_map
-    };
-    var kmlLayer = new google.maps.KmlLayer(kmlUrl, kmlOptions);
+    $scope.draw_map.mapTypes.set("OSM", new google.maps.ImageMapType({
+      getTileUrl: function(coord, zoom) {
+        // "Wrap" x (logitude) at 180th meridian properly
+        // NB: Don't touch coord.x because coord param is by reference, and changing its x property breakes something in Google's lib
+        var tilesPerGlobe = 1 << zoom;
+        var x = coord.x % tilesPerGlobe;
+        if (x < 0) {
+            x = tilesPerGlobe+x;
+        }
+        // Wrap y (latitude) in a like manner if you want to enable vertical infinite scroll
+        return "http://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png?type=rail";
+      },
+      tileSize: new google.maps.Size(256, 256),
+      name: "OpenStreetMap",
+      maxZoom: 18
+    }));
 
     google.maps.Map.prototype.getMapScale = function () {
         var circumference = 40075040, zoom, lat, scale;
@@ -103,8 +125,50 @@ function ($scope, AudioService, DKOverlay) {
     console.log(company);
   };
 
-  $scope.displayTrain = function(train) {
-    console.log(train);
+  $scope.displayTrain = function() {
+    $scope.refs = [];
+    osmAPI.get('/0.6/relation/' + $scope.train.osm_id, {}).then(function(data) {
+      console.log('relation:', data);
+      $(data).find('relation').find('member[type="way"]').each(function(index, way) {
+        $scope.refs.push($(way).attr('ref'));
+        $scope.getWay($(way).attr('ref'));
+      });
+    });
+  };
+
+  $scope.getWay = function(way_osm_id) {
+    items = [
+      { '6305893': 'mm_20_gray.png' },
+      { '345562987': 'mm_20_green.png'},
+      { '345562989': 'mm_20_orange.png'},
+      { '284887051': 'mm_20_purple.png'},
+      { '89498026': 'mm_20_red.png'},
+      { '354562985': 'mm_20_white.png'},
+      { '354562986': 'mm_20_yellow.png'},
+      { '354562987': 'mm_20_black.png'},
+      { '354562989': 'mm_20_blue.png'},
+      { '89497939': 'mm_20_brown.png'}
+    ]
+    osmAPI.get('/0.6/way/' + way_osm_id, {}).then(function(data) {
+      console.log('way:', data);
+      $(data).find('way').find('nd').each(function(index, way) {
+        var item = $.grep(items, function(e){ return Object.keys(e)[0] == $(data).find('way').attr('id'); });
+        $scope.getNode($(way).attr('ref'), item[0][$(data).find('way').attr('id')]);
+      });
+    });
+  };
+
+  $scope.getNode = function(node_osm_id, icon) {
+    osmAPI.get('/0.6/node/' + node_osm_id, {}).then(function(data) {
+      console.log('node:', $(data).find('node').attr('id'));
+      $scope.draw_map.setCenter(new google.maps.LatLng(parseFloat($(data).find('node').attr('lat')), parseFloat($(data).find('node').attr('lon'))));
+      new google.maps.Marker({
+        position: new google.maps.LatLng(parseFloat($(data).find('node').attr('lat')), parseFloat($(data).find('node').attr('lon'))),
+        map: $scope.draw_map,
+        title: $(data).find('node').attr('id'),
+        icon: 'http://labs.google.com/ridefinder/images/' + icon
+      });
+    });
   };
 
   AudioService.init();
