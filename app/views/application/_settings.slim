@@ -4,8 +4,8 @@
     p Start by picking a country and the specific train company that you would like to control.
 .row
   .columns.large-4.small-12.medium-4
-    select name="country" ng-model="country" required=true ng-options="country as country for country in countries" ng-change='focusOnCountry(country)'
+    select name="country" ng-model="country" required=true ng-options="country as country for country in countries" ng-change='displayCountry(country)'
   .columns.large-4.small-12.medium-4
-    select name="company" ng-model="company" required=true ng-options="company.name as company.name for company in companies" ng-change='displayCompany(company)'
+    select name="company" ng-model="company" required=true ng-options="company as company for company in companies" ng-change='displayCompany(company)'
   .columns.large-4.small-12.medium-4
-    select ng-model="train" ng-options="train as train.name for train in trains" ng-change='displayTrain()'
+    select ng-model="train" ng-options="train as train.tags.name for train in trains"

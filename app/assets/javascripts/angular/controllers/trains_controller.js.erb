@@ -1,14 +1,15 @@
 trainzApp.controller('TrainsController', ['$scope', 'AudioService', 'DKOverlay', 'osmAPI', 'overpassAPI',
 function ($scope, AudioService, DKOverlay, osmAPI, overpassAPI) {
+  // TEMP
+  $scope.trainPathCoordinates = [];
   // Trains
-  $scope.trains = [{
-    name: '17400 Breukelen-Veenendaal',
-    osm_id: '1860734',
+  $scope.config = {
     controls: {
       speed: 0.0001,
       follow: false
     }
-  }];
+  };
+  $scope.trains = [];
   $scope.train;
 
   $scope.timer;
@@ -16,7 +17,7 @@ function ($scope, AudioService, DKOverlay, osmAPI, overpassAPI) {
   $scope.routes = []
 
   // Countries
-  $scope.country = 'Netherlands';
+  $scope.country = 'Turkey';
   $scope.countries = ["Afghanistan","Albania","Algeria","Andorra","Angola","Anguilla","Antigua &amp; Barbuda","Argentina","Armenia","Aruba","Australia","Austria","Azerbaijan","Bahamas"
 		,"Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bhutan","Bolivia","Bosnia &amp; Herzegovina","Botswana","Brazil","British Virgin Islands"
 		,"Brunei","Bulgaria","Burkina Faso","Burundi","Cambodia","Cameroon","Cape Verde","Cayman Islands","Chad","Chile","China","Colombia","Congo","Cook Islands","Costa Rica"
@@ -34,37 +35,52 @@ function ($scope, AudioService, DKOverlay, osmAPI, overpassAPI) {
 		,"Yemen","Zambia","Zimbabwe"];
 
   // Operators
-  $scope.company = {
-    name: 'NS'
-  }
-  $scope.companies = [{ name: 'NS'}];
+  $scope.company = { name: 'NS' }
+  $scope.companies = [];
 
   $scope.horn = function () {
     AudioService.play();
   };
 
-  $scope.focusOnCountry = function(country) {
+  $scope.displayCountry = function(country) {
     var geocoder = new google.maps.Geocoder();
-    geocoder.geocode( { 'address': country }, function(results, status) {
+    geocoder.geocode({ 'address': country }, function(results, status) {
       if (status == google.maps.GeocoderStatus.OK) {
         $scope.draw_map.fitBounds(results[0].geometry.bounds);
-        $scope.draw_map.setCenter(results[0].geometry.location);
-        overpassAPI.overpass('relation(50.745,7.17,50.75,7.18)[route=train];out;').then(function(data) {
-          console.log('relation:', data);
-        });
+        $scope.trains = []
+        $scope.companies = []
+        $('.messages').html('loading ...');
+        url = "/trains?s=" + results[0].geometry.bounds.getSouthWest().lat() + "&n=" + results[0].geometry.bounds.getNorthEast().lat() + "&w=" + results[0].geometry.bounds.getSouthWest().lng() + "&e=" + results[0].geometry.bounds.getNorthEast().lng()
+        $.get(url, function(data) {
+
+          $scope.trains = data;
+          // $.each($scope.trains, function(i, train){
+            $scope.displayTrain($scope.trains[0]);
+          // });
+
+          var names = $scope.trains.map(function(n) { return n.tags.network; });
+          $.each(names, function(i, el){
+            if($.inArray(el, $scope.companies) === -1) $scope.companies.push(el);
+          });
+
+          $scope.$apply();
+
+          $('.messages').html('');
+
+        }, "json");
       } else {
-        alert("Coul not Geocode because: " + status);
+        alert("Could not Geocode because of the fact that " + status);
       }
     });
   }
 
   $scope.speedChanged = function() {
-    AudioService.setSpeed($scope.trains[0].controls.speed / 350.);
-    $scope.overlay.speed = $scope.trains[0].controls.speed;
+    AudioService.setSpeed($scope.config.controls.speed / 350.);
+    $scope.overlay.speed = $scope.config.controls.speed;
   };
 
   $scope.followChanged = function() {
-    $scope.overlay.follow = $scope.trains[0].controls.follow;
+    $scope.overlay.follow = $scope.config.controls.follow;
   };
   $scope.followIndexChanged = function() {
     $scope.overlay.setFollowIndex($scope.followIndex);
@@ -125,53 +141,36 @@ function ($scope, AudioService, DKOverlay, osmAPI, overpassAPI) {
     console.log(company);
   };
 
-  $scope.displayTrain = function() {
-    $scope.refs = [];
-    osmAPI.get('/0.6/relation/' + $scope.train.osm_id, {}).then(function(data) {
-      console.log('relation:', data);
-      $(data).find('relation').find('member[type="way"]').each(function(index, way) {
-        $scope.refs.push($(way).attr('ref'));
-        $scope.getWay($(way).attr('ref'));
+  $scope.displayTrain = function(train) {
+    $('.messages').html('loading train...');
+    osmAPI.get('/0.6/relation/' + train.id, {}).then(function(data) {
+      $(data).find('member[type="way"]').each(function(index, way) {
+        osmAPI.get('/0.6/way/' + $(way).attr('ref'), {}).then(function(way_data) {
+          osmAPI.get('/0.6/node/' + $(way_data).find('nd').attr('ref'), {}).then(function(node_data) {
+            $(node_data).find('node').each(function(index, node) {
+              $scope.trainPathCoordinates.push({
+                lat: parseFloat($(node).attr('lat')),
+                lng: parseFloat($(node).attr('lon'))
+              });
+            });
+
+            var line = new google.maps.Polyline({
+              path: $scope.trainPathCoordinates,
+              geodesic: true,
+              strokeColor: "#FF0000",
+              strokeOpacity: 1.0,
+              strokeWeight: 3
+            });
+
+            line.setMap($scope.draw_map);
+          });
+        });
       });
+      $('.messages').html('');
     });
   };
 
-  $scope.getWay = function(way_osm_id) {
-    items = [
-      { '6305893': 'mm_20_gray.png' },
-      { '345562987': 'mm_20_green.png'},
-      { '345562989': 'mm_20_orange.png'},
-      { '284887051': 'mm_20_purple.png'},
-      { '89498026': 'mm_20_red.png'},
-      { '354562985': 'mm_20_white.png'},
-      { '354562986': 'mm_20_yellow.png'},
-      { '354562987': 'mm_20_black.png'},
-      { '354562989': 'mm_20_blue.png'},
-      { '89497939': 'mm_20_brown.png'}
-    ]
-    osmAPI.get('/0.6/way/' + way_osm_id, {}).then(function(data) {
-      console.log('way:', data);
-      $(data).find('way').find('nd').each(function(index, way) {
-        var item = $.grep(items, function(e){ return Object.keys(e)[0] == $(data).find('way').attr('id'); });
-        $scope.getNode($(way).attr('ref'), item[0][$(data).find('way').attr('id')]);
-      });
-    });
-  };
-
-  $scope.getNode = function(node_osm_id, icon) {
-    osmAPI.get('/0.6/node/' + node_osm_id, {}).then(function(data) {
-      console.log('node:', $(data).find('node').attr('id'));
-      $scope.draw_map.setCenter(new google.maps.LatLng(parseFloat($(data).find('node').attr('lat')), parseFloat($(data).find('node').attr('lon'))));
-      new google.maps.Marker({
-        position: new google.maps.LatLng(parseFloat($(data).find('node').attr('lat')), parseFloat($(data).find('node').attr('lon'))),
-        map: $scope.draw_map,
-        title: $(data).find('node').attr('id'),
-        icon: 'http://labs.google.com/ridefinder/images/' + icon
-      });
-    });
-  };
-
-  AudioService.init();
+  // AudioService.init();
 
   $scope.initDrawMap();
 }]);
