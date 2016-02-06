@@ -42,20 +42,19 @@ trainzApp.controller 'SettingsController', ['$rootScope', '$scope', 'osmAPI', 'o
 
   $rootScope.$on 'fetchCompanies', (event, bounds) ->
     $('.messages').html('loading ...')
-    url = "/trains?s=" + bounds.getSouthWest().lat() + "&n=" + bounds.getNorthEast().lat() + "&w=" + bounds.getSouthWest().lng() + "&e=" + bounds.getNorthEast().lng()
+    url = "/companies?s=" + bounds.getSouthWest().lat() + "&n=" + bounds.getNorthEast().lat() + "&w=" + bounds.getSouthWest().lng() + "&e=" + bounds.getNorthEast().lng()
     $.get url, (data) ->
-      $scope.trains = data
-      # $.each($scope.trains, function(i, train){
-      # $scope.displayTrain($scope.trains[0]);
-      # });
-      # var names = $scope.trains.map(function(n) { return n.tags.network; });
-      # $.each(names, function(i, el){
-      #   if($.inArray(el, $scope.companies) === -1) $scope.companies.push(el);
-      # })
+      $scope.companies = data
       $scope.$apply()
       $('.messages').html('')
     , "json"
 
-  $rootScope.$on 'fetchTrains', (event) ->
-    console.log('TODO')
+  $rootScope.$on 'fetchTrains', (event, bounds) ->
+    $('.messages').html('loading ...')
+    url = "/trains?s=" + bounds.getSouthWest().lat() + "&n=" + bounds.getNorthEast().lat() + "&w=" + bounds.getSouthWest().lng() + "&e=" + bounds.getNorthEast().lng()
+    $.get url, (data) ->
+      $scope.trains = data
+      $scope.$apply()
+      $('.messages').html('')
+    , "json"
 ]

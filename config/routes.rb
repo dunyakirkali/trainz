@@ -3,5 +3,6 @@ Trainz::Application.routes.draw do
 
   root 'pages#home'
 
-  get 'trains', to: 'trains#index', as: :trains
+  get 'companies', to: 'trains#companies'
+  get 'trains', to: 'trains#index'
 end

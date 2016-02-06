@@ -4,10 +4,8 @@ html lang="en" ng-app="trainzApp"
     meta charset="utf-8"
     meta name="viewport" content="width=device-width, initial-scale=1.0"
     title Trainz
-    
     = stylesheet_link_tag "application", media: "all"
     = javascript_include_tag "https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=geometry", "application"
-
     = csrf_meta_tags
     
   body ng-controller="TrainsController"
