@@ -28,6 +28,10 @@ group :test do
   gem 'rspec-rails'
 end
 
+group :development do
+  gem 'pry-rails'
+end
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-foundation', '~> 5.5.3'
   gem 'rails-assets-buzz', '~> 1.1.10'
