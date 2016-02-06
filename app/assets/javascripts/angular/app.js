@@ -1,1 +1,1 @@
-var trainzApp = angular.module('trainzApp', ['ui.slider', 'osm']);
+var trainzApp = angular.module('trainzApp', ['ui.slider']);

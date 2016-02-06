@@ -1,17 +1,17 @@
-trainzApp.controller('TrainsController', ['$rootScope', '$scope', 'AudioService', 'osmAPI', 'overpassAPI',
-function ($rootScope, $scope, AudioService, osmAPI, overpassAPI) {
+trainzApp.controller('TrainsController', ['$rootScope', '$scope', 'AudioService',
+function ($rootScope, $scope, AudioService) {
   // TEMP
   $scope.trainPathCoordinates = [];
   // Trains
   $scope.config = {
     controls: {
       speed: 0.0001,
-      follow: false
+      follow: false,
+      followIndex: 0
     }
   };
 
   $scope.timer;
-  $scope.followIndex = 0;
   $scope.routes = []
 
   $rootScope.$on('trainChanged', function(event, train) {
@@ -28,15 +28,14 @@ function ($rootScope, $scope, AudioService, osmAPI, overpassAPI) {
   };
 
   $scope.speedChanged = function() {
-    AudioService.setSpeed($scope.config.controls.speed / 350.);
-    $scope.overlay.speed = $scope.config.controls.speed;
+    $rootScope.$broadcast('controlsChanged', $scope.config.controls)
   };
 
   $scope.followChanged = function() {
-    $scope.overlay.follow = $scope.config.controls.follow;
+    $rootScope.$broadcast('controlsChanged', $scope.config.controls)
   };
   $scope.followIndexChanged = function() {
-    $scope.overlay.setFollowIndex($scope.followIndex);
+    $rootScope.$broadcast('controlsChanged', $scope.config.controls)
   };
 
   // AudioService.init();

@@ -4,50 +4,50 @@
   "carriages": [{
     "type": "passenger",
     "color": "#253020",
-    "length": 31.0
+    "length": 30
   },{
     "type": "freight",
     "color": "#736243",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#738C5A",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#738C5A",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#BFA575",
-    "length": 44
+    "length": 30
   },{
     "type": "freight",
     "color": "#BFA575",
-    "length": 27
+    "length": 30
   },{
     "type": "freight",
     "color": "#B5AB8D",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#738C5A",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#B5AB8D",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#BFA575",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#BFA575",
-    "length": 23
+    "length": 30
   },{
     "type": "freight",
     "color": "#736243",
-    "length": 23
+    "length": 30
   }]
 }]

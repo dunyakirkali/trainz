@@ -18,31 +18,8 @@ function DKOverlay(map) {
 }
 
 DKOverlay.prototype.onAdd = function() {
-
-  var that = this;
-
   this.div = d3.select(this.getPanes().overlayLayer).append("div").attr("id", "d3map");
   this.svg = this.div.append('svg:svg');
-
-  d3.json("<%= asset_path 'track.json' %>", function(json) {
-    var gBounds = d3.geo.bounds(json);
-    var sw = new google.maps.LatLng(gBounds[0][1], gBounds[0][0])
-    var ne = new google.maps.LatLng(gBounds[1][1], gBounds[1][0])
-
-    that.center = d3.geo.centroid(json);
-    that.gmap.setCenter(new google.maps.LatLng(that.center[1], that.center[0]));
-    that.bounds = new google.maps.LatLngBounds(sw, ne);
-    that.addTrack(json.features);
-
-    d3.json("<%= asset_path 'trains.json' %>", function(json) {
-      that.addTrain(json[0]);
-    });
-
-    that.dataLoaded = true;
-  });
-
-  // google.maps.event.addListener(this.gmap, 'bounds_changed', this.draw);
-  // google.maps.event.addListener(this.gmap, 'center_changed', this.redraw);
 };
 
 DKOverlay.prototype.addTrack = function(track) {
@@ -73,9 +50,9 @@ DKOverlay.prototype.addTrain = function(train) {
     var carriage = train.carriages[i];
     this.circles[i] = trains.append("circle").attr({ r: 10 }).attr('fill', carriage.color);
     this.lengths[i] = parseFloat(carriage.length);
-    this.texts[i] = this.circles[i].append("text")
-       .attr("text-anchor", "middle")
-       .text(i);
+    // this.texts[i] = this.circles[i].append("text")
+    //    .attr("text-anchor", "middle")
+    //    .text(i);
   }
 };
 
@@ -120,11 +97,10 @@ DKOverlay.prototype.redraw = function() {
   $("#d3map").css('width', (nec.x - swc.x) + 'px');
   $("#d3map").css('height', (swc.y - nec.y) + 'px');
 
-
   var that = this;
   for(var i = 0; i < this.circles.length; i++) {
     this.circles[i].transition()
-      .duration(30).attr({
+      .duration(60).attr({
       transform: function () {
         var total = 0;
         $.each(that.lengths.slice(0, i+1),function() {
@@ -152,6 +128,44 @@ DKOverlay.prototype.onRemove = function() {
 
 DKOverlay.prototype.setFollowIndex = function(fllwNdx) {
   this.followIndex = fllwNdx;
+};
+
+DKOverlay.prototype.setTrack = function(track) {
+
+  geo_track = {
+    "type": "FeatureCollection",
+    "features": []
+  };
+
+  var outer_index = 0;
+  $.each(track, function(key, way) {
+    geo_track.features.push({
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": []
+      }
+    });
+    $.each(way, function(index, node) {
+      geo_track.features[outer_index].geometry.coordinates.push([node.lon, node.lat, 0]);
+    });
+    outer_index += 1;
+  });
+  var gBounds = d3.geo.bounds(geo_track);
+  var sw = new google.maps.LatLng(gBounds[0][1], gBounds[0][0])
+  var ne = new google.maps.LatLng(gBounds[1][1], gBounds[1][0])
+
+  this.center = d3.geo.centroid(geo_track);
+  this.gmap.setCenter(new google.maps.LatLng(this.center[1], this.center[0]));
+  this.bounds = new google.maps.LatLngBounds(sw, ne);
+  this.addTrack(geo_track.features);
+
+  var that = this;
+  d3.json("<%= asset_path 'trains.json' %>", function(json) {
+    that.addTrain(json[0]);
+  });
+
+  this.dataLoaded = true;
 };
 
 trainzApp.factory('DKOverlay', ['$rootScope', function ($rootScope) {

@@ -38,5 +38,4 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-chosen', '~> 1.4.2'
   gem 'rails-assets-d3', '~> 3.5.12'
   gem 'rails-assets-angularjs', '~> 1.4.8'
-  gem 'rails-assets-angular-osm'
 end

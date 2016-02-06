@@ -62,7 +62,13 @@ trainzApp.controller 'MapController', ['$rootScope', '$scope', 'DKOverlay', ($ro
     $scope.drawTrains(trains)
 
   $rootScope.$on 'trainFetched', (event, train) ->
+    $scope.overlay.setTrack(train)
     $scope.drawTrains(train)
 
+  $rootScope.$on 'controlsChanged', (event, controls) ->
+    # AudioService.setSpeed($scope.config.controls.speed / 350.)
+    $scope.overlay.speed = controls.speed
+    $scope.overlay.follow = controls.follow
+    # $scope.overlay.setFollowIndex controls.followIndex
   $scope.initDrawMap()
 ]
