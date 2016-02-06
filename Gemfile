@@ -11,10 +11,10 @@ gem 'jquery-rails', '~> 3.1.0'
 gem 'jquery-ui-rails', '~> 4.2.0'
 gem 'jbuilder', '~> 1.2'
 gem 'slim-rails', '~> 2.1.0'
-gem 'carmen-rails', '~> 1.0.0'
 gem 'compass-rails', '~> 2.0.4'
 gem 'rack-google-analytics', '~> 1.2.0'
 gem 'overpass-api-ruby', require: 'overpass_api_ruby'
+gem 'countries', require: 'countries/global'
 
 group :doc do
   gem 'sdoc', require: false
