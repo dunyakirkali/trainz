@@ -3,7 +3,7 @@ Trainz::Application.routes.draw do
 
   root 'pages#home'
 
-  get 'countries', to: 'trains#countries'
-  get 'trains', to: 'trains#trains'
   get 'draw', to: 'trains#draw'
+  resources :trains, only: [:show, :index]
+  resources :countries, only: :index
 end

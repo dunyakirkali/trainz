@@ -1,5 +1,5 @@
-trainzApp.controller('TrainsController', ['$scope', 'AudioService', 'osmAPI', 'overpassAPI',
-function ($scope, AudioService, osmAPI, overpassAPI) {
+trainzApp.controller('TrainsController', ['$rootScope', '$scope', 'AudioService', 'osmAPI', 'overpassAPI',
+function ($rootScope, $scope, AudioService, osmAPI, overpassAPI) {
   // TEMP
   $scope.trainPathCoordinates = [];
   // Trains
@@ -13,6 +13,15 @@ function ($scope, AudioService, osmAPI, overpassAPI) {
   $scope.timer;
   $scope.followIndex = 0;
   $scope.routes = []
+
+  $rootScope.$on('trainChanged', function(event, train) {
+    $scope.train = train;
+    $('.messages').append('<p class="train">loading train ...</p>');
+    $.get("/trains/" + train.id, function(data) {
+      $rootScope.$broadcast('trainFetched', data)
+      $('.messages .train').remove()
+    }, "json");
+  });
 
   $scope.horn = function () {
     AudioService.play();
@@ -28,35 +37,6 @@ function ($scope, AudioService, osmAPI, overpassAPI) {
   };
   $scope.followIndexChanged = function() {
     $scope.overlay.setFollowIndex($scope.followIndex);
-  };
-
-  $scope.displayTrain = function(train) {
-    $('.messages').html('loading train...');
-    osmAPI.get('/0.6/relation/' + train.id, {}).then(function(data) {
-      $(data).find('member[type="way"]').each(function(index, way) {
-        osmAPI.get('/0.6/way/' + $(way).attr('ref'), {}).then(function(way_data) {
-          osmAPI.get('/0.6/node/' + $(way_data).find('nd').attr('ref'), {}).then(function(node_data) {
-            $(node_data).find('node').each(function(index, node) {
-              $scope.trainPathCoordinates.push({
-                lat: parseFloat($(node).attr('lat')),
-                lng: parseFloat($(node).attr('lon'))
-              });
-            });
-
-            var line = new google.maps.Polyline({
-              path: $scope.trainPathCoordinates,
-              geodesic: true,
-              strokeColor: "#FF0000",
-              strokeOpacity: 1.0,
-              strokeWeight: 3
-            });
-
-            line.setMap($scope.draw_map);
-          });
-        });
-      });
-      $('.messages').html('');
-    });
   };
 
   // AudioService.init();

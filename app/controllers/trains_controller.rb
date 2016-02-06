@@ -24,29 +24,41 @@ class TrainsController < ApplicationController
     render json: grouped_nodes
   end
 
-  def trains
+  def index
     ba_query = '<query type="relation"><has-kv k="type" regv="route"/><has-kv k="route" regv="train"/></query>'
     result = overpass.query(ba_query).to_a
-    puts result.count
     trains = result.select { |item| item[:type] == 'relation' }
-    puts trains.count
     render json: trains
   end
 
-  def countries
-    render json: ISO3166::Country.all_translated
+  def show
+    grouped_nodes = {}
+    ba_query = "
+      <id-query ref='#{params[:id]}' type='relation'/>
+      <union>
+        <item/><recurse type='down'/>
+      </union>
+    "
+    result = overpass.query(ba_query).to_a
+
+    ways = result.select { |item| item[:type] == 'way' }
+    puts "#{ways.count} ways"
+
+    nodes = result.select { |item| item[:type] == 'node' }
+    puts "#{nodes.count} nodes"
+
+    # Get Nodes
+    ways.each_with_index do |way, index|
+      ways_nodes = way[:nodes].map { |way_node_id| nodes.find { |node| node[:id] == way_node_id } }
+      grouped_nodes[way[:id].to_s] = ways_nodes
+    end
+    render json: grouped_nodes
   end
 
   private
 
   def options
     {
-      bbox: {
-        s: params[:s],
-        n: params[:n],
-        w: params[:w],
-        e: params[:e]
-      },
       timeout: 30,
       # element_limit: 107374,
       json: true
@@ -54,6 +66,16 @@ class TrainsController < ApplicationController
   end
 
   def overpass
-    @overpass ||= OverpassAPI.new(options)
+    full_options = options
+    full_options = options.merge!({
+      bbox: {
+        s: params[:s],
+        n: params[:n],
+        w: params[:w],
+        e: params[:e]
+      }
+    }) if params[:s].present?
+    puts full_options
+    OverpassAPI.new(full_options)
   end
 end

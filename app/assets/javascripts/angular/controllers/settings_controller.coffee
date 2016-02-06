@@ -14,6 +14,9 @@ trainzApp.controller 'SettingsController', ['$rootScope', '$scope', 'osmAPI', 'o
   $scope.displayCountry = () ->
     $rootScope.$emit('countryChanged', $scope.settings.country)
 
+  $scope.displayTrain = () ->
+    $rootScope.$emit('trainChanged', $scope.settings.train)
+
   $scope.resetCompanies = () ->
     $scope.companies = []
 
@@ -42,7 +45,7 @@ trainzApp.controller 'SettingsController', ['$rootScope', '$scope', 'osmAPI', 'o
     , "json"
 
   $rootScope.$on 'fetchTrains', (event, bounds) ->
-    $('.messages').append('<p class="trains">loading trains ...</p>')
+    $('.messages').append('<p class="trains"><image src="https://media.giphy.com/media/3oEduJHoaoDEkXdzxK/giphy.gif"></image></p>')
     $('#country-select').prop('disabled', true).trigger("chosen:updated")
     $('#company-select').prop('disabled', true).trigger("chosen:updated")
     $('#train-select').prop('disabled', true).trigger("chosen:updated")
@@ -52,6 +55,7 @@ trainzApp.controller 'SettingsController', ['$rootScope', '$scope', 'osmAPI', 'o
       company_names = $.map $scope.trains, (train, index) ->
         train.tags.operator
       $scope.companies = $scope.unique(company_names)
+      console.log($scope.trains[2])
       $scope.$apply()
       $('.messages .trains').remove()
       $('#country-select').prop('disabled', false).trigger("chosen:updated")

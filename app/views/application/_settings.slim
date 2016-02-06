@@ -1,4 +1,4 @@
-.row ng-controller="SettingsController"
+.row ng-hide="train" ng-controller="SettingsController"
   .row
     .columns.small-12
       h2.subheader= t("settings.title")
@@ -9,7 +9,7 @@
       select#country-select ng-model="settings.country" required=true ng-options="country as country for country in countries" ng-change="displayCountry()"
       
     .columns.large-4.small-12.medium-4
-      select#company-select ng-model="settings.company" required=true ng-options="company as company for company in companies" ng-change="displayCompany()"
+      select#company-select ng-model="settings.company" ng-options="company as company for company in companies" ng-change="displayCompany()"
       
     .columns.large-4.small-12.medium-4
-      select#train-select ng-model="settings.train" ng-options="train as train.tags.name for train in trains"
+      select#train-select ng-model="settings.train" ng-options="train as train.tags.name for train in trains" ng-change="displayTrain()"

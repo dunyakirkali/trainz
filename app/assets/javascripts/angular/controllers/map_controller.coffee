@@ -61,5 +61,8 @@ trainzApp.controller 'MapController', ['$rootScope', '$scope', 'DKOverlay', ($ro
   $rootScope.$on 'trainsChanged', (event, trains) ->
     $scope.drawTrains(trains)
 
+  $rootScope.$on 'trainFetched', (event, train) ->
+    $scope.drawTrains(train)
+
   $scope.initDrawMap()
 ]
