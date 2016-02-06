@@ -20,6 +20,13 @@ trainzApp.controller 'SettingsController', ['$rootScope', '$scope', 'osmAPI', 'o
   $scope.resetTrains = () ->
     $scope.trains = []
 
+  $scope.unique = (list) ->
+    result = []
+    $.each list, (i, e) ->
+      if $.inArray(e, result) == -1
+        result.push(e)
+    result
+
   $rootScope.$on 'resetCompanies', (event) ->
     $scope.resetCompanies()
 
@@ -27,29 +34,29 @@ trainzApp.controller 'SettingsController', ['$rootScope', '$scope', 'osmAPI', 'o
     $scope.resetTrains()
 
   $rootScope.$on 'fetchCountries', (event, bounds) ->
-    $('.messages').html('loading ...')
+    $('.messages').append('<p class="countries">loading countries ...</p>')
     $.get "/countries", (data) ->
       $scope.countries = data
       $scope.$apply()
-      $('.messages').html('')
-    , "json"
-
-  $rootScope.$on 'fetchCompanies', (event, bounds) ->
-    $('.messages').html('loading ...')
-    url = "/companies?s=" + bounds.getSouthWest().lat() + "&n=" + bounds.getNorthEast().lat() + "&w=" + bounds.getSouthWest().lng() + "&e=" + bounds.getNorthEast().lng()
-    $.get url, (data) ->
-      $scope.companies = data
-      $scope.$apply()
-      $('.messages').html('')
+      $('.messages .countries').remove()
     , "json"
 
   $rootScope.$on 'fetchTrains', (event, bounds) ->
-    $('.messages').html('loading ...')
+    $('.messages').append('<p class="trains">loading trains ...</p>')
+    $('#country-select').prop('disabled', true).trigger("chosen:updated")
+    $('#company-select').prop('disabled', true).trigger("chosen:updated")
+    $('#train-select').prop('disabled', true).trigger("chosen:updated")
     url = "/trains?s=" + bounds.getSouthWest().lat() + "&n=" + bounds.getNorthEast().lat() + "&w=" + bounds.getSouthWest().lng() + "&e=" + bounds.getNorthEast().lng()
     $.get url, (data) ->
       $scope.trains = data
+      company_names = $.map $scope.trains, (train, index) ->
+        train.tags.operator
+      $scope.companies = $scope.unique(company_names)
       $scope.$apply()
-      $('.messages').html('')
+      $('.messages .trains').remove()
+      $('#country-select').prop('disabled', false).trigger("chosen:updated")
+      $('#company-select').prop('disabled', false).trigger("chosen:updated")
+      $('#train-select').prop('disabled', false).trigger("chosen:updated")
     , "json"
 
   $rootScope.$emit('fetchCountries')

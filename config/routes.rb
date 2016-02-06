@@ -4,6 +4,6 @@ Trainz::Application.routes.draw do
   root 'pages#home'
 
   get 'countries', to: 'trains#countries'
-  get 'companies', to: 'trains#companies'
-  get 'trains', to: 'trains#index'
+  get 'trains', to: 'trains#trains'
+  get 'draw', to: 'trains#draw'
 end

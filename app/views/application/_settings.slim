@@ -6,10 +6,10 @@
 
   .row
     .columns.large-4.small-12.medium-4
-      select ng-model="settings.country" required=true ng-options="country as country for country in countries" ng-change="displayCountry()"
+      select#country-select ng-model="settings.country" required=true ng-options="country as country for country in countries" ng-change="displayCountry()"
       
     .columns.large-4.small-12.medium-4
-      select ng-model="settings.company" required=true ng-options="company as company for company in companies" ng-change="displayCompany()"
+      select#company-select ng-model="settings.company" required=true ng-options="company as company for company in companies" ng-change="displayCompany()"
       
     .columns.large-4.small-12.medium-4
-      select ng-model="settings.train" ng-options="train as train.tags.name for train in trains"
+      select#train-select ng-model="settings.train" ng-options="train as train.tags.name for train in trains"
