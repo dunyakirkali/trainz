@@ -15,10 +15,14 @@ class TrainsController < ApplicationController
     # overpass = OverpassAPI.new(options)
     # result_hash = overpass.query(ba_query)
     # render json: result_hash
-    render json: ['Eskisehir Expresi']
+    render json: [{name: 'Eskisehir Expresi'}]
   end
 
   def companies
     render json: ['NS']
+  end
+
+  def countries
+    render json: ISO3166::Country.all_translated
   end
 end
